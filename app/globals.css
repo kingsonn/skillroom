@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
+  }
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 17, 24, 39;
+    --background-end-rgb: 17, 24, 39;
+  }
+}
+
+/* Theme transition */
+.theme-transition {
+  @apply transition-colors duration-200;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Smooth transitions */
+.transition-all {
+  @apply transition-[all] duration-200 ease-in-out;
+}
+
+/* Module card hover effects */
+.module-card {
+  @apply transition-transform duration-200 hover:scale-105;
+}
+
+/* Connection lines between modules */
+.connection-line {
+  @apply absolute border-2 border-blue-500 dark:border-blue-400 opacity-50 transition-opacity duration-200;
+}
+
+.connection-line:hover {
+  @apply opacity-100;
+}
+
+/* Achievement badges */
+.achievement-badge {
+  @apply transition-all duration-200 hover:scale-110 hover:rotate-12;
+}
+
+/* Skill tags */
+.skill-tag {
+  @apply transition-colors duration-200;
+}
+
+/* Button hover effects */
+button {
+  @apply transition-all duration-200;
+}
+
+/* Input focus effects */
+input, textarea {
+  @apply transition-shadow duration-200;
+}
+
+/* Link hover effects */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* Card hover effects */
+.card {
+  @apply transition-shadow duration-200 hover:shadow-lg;
+}
+
+/* Progress bar animations */
+.progress-bar {
+  @apply transition-all duration-500;
+}
+
+/* Tooltip animations */
+.tooltip {
+  @apply transition-opacity duration-200;
+}
+
+/* Modal animations */
+.modal {
+  @apply transition-opacity duration-200;
+}
+
+/* Sidebar animations */
+.sidebar {
+  @apply transition-transform duration-300;
+}
+
+/* Header animations */
+.header {
+  @apply transition-colors duration-200;
+}
+
+/* XP counter animation */
+.xp-counter {
+  @apply transition-all duration-500;
+}
+
+/* Achievement unlock animation */
+.achievement-unlock {
+  @apply animate-bounce;
+}
+
+/* Level up animation */
+.level-up {
+  @apply animate-pulse;
+}
+
+/* Chat message animation */
+.chat-message {
+  @apply animate-fade-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
