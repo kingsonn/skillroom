@@ -1,11 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Enable standalone mode for Cloud Run
+  output: 'standalone',
   experimental: {
     serverActions: true,
   },
   images: {
-    domains: ['lh3.googleusercontent.com'], // Add any image domains you're using
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+    ],
   },
 }
 

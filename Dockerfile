@@ -1,72 +1,48 @@
-# Use Node.js 18 as the base image
+# Install dependencies only when needed
 FROM node:18-alpine AS deps
-
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
+# Install dependencies needed for build
+COPY package.json package-lock.json ./
 RUN npm ci
 
 # Rebuild the source code only when needed
 FROM node:18-alpine AS builder
 WORKDIR /app
+
+# Copy all files
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-ENV NEXT_TELEMETRY_DISABLED 1
+# Set environment variables
+ENV NEXT_PUBLIC_SUPABASE_URL=https://uzufwojpgyxicaypshtj.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6dWZ3b2pwZ3l4aWNheXBzaHRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwODAxOTcsImV4cCI6MjA0OTY1NjE5N30.azYnTVbCUy2edOB8nt3NUuw-UF6CVgaYoidpPMFtiuE
+ENV NEXT_PUBLIC_LANGFLOW_API_TOKEN=AstraCS:KsJIgXpPBGQlUgTCscrUKmZJ:c011c832c39619c01666f6db5a60b7cebc93fd45e4ebae9db44e1c0887e453e0
+ENV NEXT_PUBLIC_LANGFLOW_API_URL=https://api.langflow.astra.datastax.com/lf/42ddac8d-fc81-42af-bfd2-ca48f2d02204/api/v1/run/sf1
 
-# Copy environment variables for build
-COPY .env.production .env.production
-
-# Set build-time variables
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG NEXT_PUBLIC_LANGFLOW_API_URL
-ARG NEXT_PUBLIC_LANGFLOW_API_TOKEN
-
-# Pass build-time variables to runtime
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV NEXT_PUBLIC_LANGFLOW_API_URL=$NEXT_PUBLIC_LANGFLOW_API_URL
-ENV NEXT_PUBLIC_LANGFLOW_API_TOKEN=$NEXT_PUBLIC_LANGFLOW_API_TOKEN
-
+# Build the application
+ENV NODE_ENV=production
 RUN npm run build
 
 # Production image, copy all the files and run next
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy runtime environment variables
-COPY --from=builder /app/.env.production ./.env.production
-
+# Copy necessary files
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-# Set the correct permission for prerender cache
-RUN chmod 1777 /tmp
+# Set environment variables for runtime
+ENV NEXT_PUBLIC_SUPABASE_URL=https://uzufwojpgyxicaypshtj.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6dWZ3b2pwZ3l4aWNheXBzaHRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwODAxOTcsImV4cCI6MjA0OTY1NjE5N30.azYnTVbCUy2edOB8nt3NUuw-UF6CVgaYoidpPMFtiuE
+ENV NEXT_PUBLIC_LANGFLOW_API_TOKEN=AstraCS:KsJIgXpPBGQlUgTCscrUKmZJ:c011c832c39619c01666f6db5a60b7cebc93fd45e4ebae9db44e1c0887e453e0
+ENV NEXT_PUBLIC_LANGFLOW_API_URL=https://api.langflow.astra.datastax.com/lf/42ddac8d-fc81-42af-bfd2-ca48f2d02204/api/v1/run/sf1
 
 EXPOSE 8080
-
-ENV PORT 8080
-ENV HOSTNAME "0.0.0.0"
 
 CMD ["node", "server.js"]
