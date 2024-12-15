@@ -17,3 +17,5 @@ coverage/
 *.log
 *.swp
 *.swo
+# Don't ignore production env file
+!.env.production
