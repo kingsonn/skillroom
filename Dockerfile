@@ -32,8 +32,10 @@ ENV NODE_ENV=production
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
+# Create public directory if it doesn't exist
+RUN mkdir -p public
+
 # Copy necessary files
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
