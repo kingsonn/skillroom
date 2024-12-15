@@ -8,7 +8,6 @@ import ThemeToggle from './ThemeToggle';
 import { SignInModal } from './SignInModal';
 import { WelcomePopup } from './WelcomePopup';
 import { signout } from '../lib/auth-actions';
-import { ensureUserProfile } from '../utils/profile-utils';
 import Sidebar from './Sidebar';
 
 export default function Layout({ children }) {
@@ -35,10 +34,10 @@ export default function Layout({ children }) {
             localStorage.setItem('hasLoggedInBefore', 'true');
             setShowWelcomePopup(true);
           }
-          const isNew = await checkNew(session.user.email);
-          if (isNew) {
-            setShowWelcomePopup(true);
-          }
+          // const isNew = await checkNew(session.user.email);
+          // if (isNew) {
+          //   setShowWelcomePopup(true);
+          // }
           localStorage.setItem('userEmail', session.user.email);
           setUserEmail(session.user.email);
           // Ensure user profile exists
