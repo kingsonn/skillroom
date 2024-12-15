@@ -1,40 +1,19 @@
-# Dependencies
-node_modules
-.pnp
-.pnp.js
-
-# Testing
-coverage
-.nyc_output
-
-# Next.js
-.next
-out
-
-# Production
-build
-
-# Misc
-.DS_Store
-*.pem
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Local env files
-.env*.local
-.env
-
-# Git
-.git
-.gitignore
-
-# IDE
-.idea
-.vscode
-
-# Docker
 Dockerfile
 .dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+.DS_Store
+.vscode/
+coverage/
+.idea/
+*.log
+*.swp
+*.swo

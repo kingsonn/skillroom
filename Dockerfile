@@ -21,17 +21,21 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Set environment to production
-ENV NODE_ENV=production
+# Set environment variables
+ENV NODE_ENV production
+ENV PORT 8080
 
 # Copy necessary files from builder
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/package.json ./package.json
 
-# Expose the port
-ENV PORT 8080
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Expose port 8080 (Cloud Run default)
 EXPOSE 8080
 
 # Start the application
