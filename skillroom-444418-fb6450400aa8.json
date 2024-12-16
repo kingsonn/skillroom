@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "skillroom-444418",
+  "private_key_id": "fb6450400aa882bd7c8d4e96f575b4f41d9d5c12",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC6hoaj1NUluHCj\ne2ggdTRBoKsK4nauw8vvH1Wk9rzLvTJoPTgQe5MbShbpxJdNeh9d0e3RWZkcx6TM\na1CAw9pi4qNCYvQ01oSu7pH8tdVrpM+AXmkqnG30MxKQOkA5lhBTwAwCEudRfLjY\noCt3b1YQzmNw71ohOTml1SGj2FPDtG1jT1J06xT6jMRlxUIgpHDmI5tueM7NJxn2\n+iGvei/o+BRf10gARsT69kdor9sX6EZqu8K/BRBmtg44aEavaDKh5ZyatXhv9ZLD\nYfTqLsSHaIwvd3NGHcOfChCpB5xmNNLrFMO2tUPumuhBDVrZ6DVJQyfg8ZcEKrqt\nKW+OUETVAgMBAAECggEAJgv6usBXGfKdRzuM6dH+bsSPHxFClDNsDcKefZ+2svhM\np+aU4QfT4eUi91waYLtgWorPr7xO9wfiHbBmI13P1gvUsV3t4jk/p08SiDGu7t4X\nVV/so7x00TL5vmGjaBusCOlLicDBXmXKbqV9OEeFjrgKoKayA8TgdWscCYe+zlRN\narGO7GZGRKky7UxjYvCcNjLoBJwj0NcCD903D+ftfc0zRaw/bK09CXuBiD9CbrZD\nOLHDXA+pbArEmVMQojPrnrilM+G1qZlxPEtKfPtGHeABdwRTaBn4rPjU3CGvSULe\n7B+NqLJpUzt9Am/clnqeHOYc61xJZEyGxcVTjq4MoQKBgQD5t5KaxuYvTIjzkJkR\ng4XrbrChwqdGDb1hPSL7PT4pus19vrS2Kug5Ub9aIQ+GT/7R3N4yAd5oKtqIZ03N\nvz5QD51bbXxCi0mGxVaSpcHwkAuN9KNo1FSPxNG8EDGEV6AWfdAb/O/Cxm0Be7Ho\ntdBH4k9DqXlFtHbmz52teMZv8wKBgQC/N++z44pI5fGXt54oqP4PEIO1WjxOvfrm\ntUIbAuBOYb5oTrjDTMb/C920rS8QVq699S5g1BLKBTzLI4hH0A6oJqcqHBXxzu8/\ngu/UtCbooGFy1cHqpZ5Ki+e2F2ikfIna7ufvHORCY669SwJNGRQCZmmD+lHF4vgY\nwx3jGVZyFwKBgQCicBZulimP5QJFJe9cJCkOH9/IKb3z5OYnBcTml00Dih83x8D3\nquuKtbF6qHzXytugmkLzVqHdMtsa1dAXoWqgW7fpjEvDYaW/hEivdiG1IY5Slith\n+pTTPJ2N7x62zuU1HDwuqJcyJS8tQtBU50gIKp+TDP/1JtIdjDouaJz0nwKBgQCx\nberaxXjMGalp+PQlkGFlgxJjVZ5+BiRorKnxPGL7+BBg4yLn/Tbs84q+GrB//Z7Z\nHkbxi/b/Q4rch1TuJa1j87HLDhKCtFwlV47IlH1B/4dMsfHkk9bkHxtbSC9N6U1V\nO7c0lV9sBujeNlqlRW7epz6jOsNj1i4Vc/8oeZtP8wKBgE6S+aA2tpcGH96ZkU01\nP/8oayCo+JuJw1oFBWD48u7Eu0irhtDBTAPfO5e5KCBnszA9kAOBSoj4VeZpHKtz\nLFdFTgVytAJxBwBbqTXC87WzlFIhYv5prDRbEJJw7GTFEXhtV7LmwmPvfADH6yDG\ng0yOLPCGfAHB2ToMJjNm9R82\n-----END PRIVATE KEY-----\n",
+  "client_email": "langflow-vertext@skillroom-444418.iam.gserviceaccount.com",
+  "client_id": "113568331620512552436",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/langflow-vertext%40skillroom-444418.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
