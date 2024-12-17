@@ -746,7 +746,7 @@ export default function LearningPage() {
                                     <p className="text-gray-600 dark:text-gray-400">{lesson["practical outcome"]}</p>
                                   </div>
 
-                                  {lesson.prerequisites && lesson.prerequisites.length > 0 && (
+                                  {/* {lesson.prerequisites && lesson.prerequisites.length > 0 && (
                                     <div>
                                       <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Prerequisites</h4>
                                       <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
@@ -755,7 +755,7 @@ export default function LearningPage() {
                                         ))}
                                       </ul>
                                     </div>
-                                  )}
+                                  )} */}
 
                                   <div>
                                     <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Topics Covered</h4>
@@ -777,7 +777,7 @@ export default function LearningPage() {
                                   )}
                                 </div>
                               )}
-                              {!isActive && lesson.prerequisites && lesson.prerequisites.length > 0 && (
+                              {/* {!isActive && lesson.prerequisites && lesson.prerequisites.length > 0 && (
                                 <div className="mt-2">
                                   <button
                                     onClick={() => {
@@ -801,7 +801,7 @@ export default function LearningPage() {
                                     </div>
                                   </div>
                                 </div>
-                              )}
+                              )} */}
                             </div>
                           </div>
                         </div>
