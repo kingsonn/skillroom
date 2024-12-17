@@ -536,8 +536,8 @@ export default function LearningPage() {
                   </div>
                   
                   <div className="space-y-6">
-                    {moduleData?.find(skill => skill.name === selectedSkill)?.modules.map((module, index) => (
-                      <div
+                  {(moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.modules || moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.skill?.modules)?.map((module, index) => (
+                    <div
                         key={index}
                         onClick={() => handleModuleClick(module)}
                         className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
@@ -591,21 +591,22 @@ export default function LearningPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {moduleData?.map((skill, index) => (
+                      
                       <div
                         key={index}
-                        onClick={() => handleSkillClick(skill.name)}
+                        onClick={() => handleSkillClick(skill.name || skill?.skill.name)}
                         className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer p-6"
                       >
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold">{skill.name}</h3>
+                          <h3 className="text-xl font-semibold">{skill.name ||skill?.skill.name}</h3>
                           <FiArrowRight className="text-xl text-purple-500" />
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {skill.description}
+                          {skill.skill.description}
                         </p>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <span className="flex items-center">
-                            <FiBook className="mr-1" /> {skill.modules.length} Modules
+                            <FiBook className="mr-1" /> {skill?.modules?.length || skill?.skill.modules.length} Modules
                           </span>
                         </div>
                       </div>

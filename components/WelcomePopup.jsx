@@ -94,34 +94,36 @@ export function WelcomePopup({ isOpen, onClose }) {
     setCurrentStep(prev => prev - 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            username: formData.username,
-            age: formData.age,
-            location: formData.location,
-            
-            preferences: formData.hobbies,
-            first_time: false,
-            professional_profile:{education_level: formData.educationLevel,
-              professional_background: formData.professionalBackground,
-              primary_career_interest: formData.primaryCareerInterest,
-              skill_set: formData.skillSet,
-              career_goals: formData.careerGoals},
-            
-          })
-          .eq('email', localStorage.getItem('userEmail'));
+     
 
-        if (error) throw error;
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          username: formData.username,
+          age: formData.age,
+          location: formData.location,
+          
+          preferences: formData.hobbies,
+          first_time: false,
+          professional_profile:{education_level: formData.educationLevel,
+            professional_background: formData.professionalBackground,
+            primary_career_interest: formData.primaryCareerInterest,
+            skill_set: formData.skillSet,
+            career_goals: formData.careerGoals},
+          
+        })
+        .eq('email', localStorage.getItem('userEmail'));
+
+      if (error) throw error;
+      
+      onClose(); // Close the popup after successful submission
     } catch (error) {
       console.error('Error updating profile:', error);
     }
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -417,12 +419,12 @@ export function WelcomePopup({ isOpen, onClose }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl mx-auto relative overflow-hidden">
         <div className="absolute top-3 right-3">
-          <button
+          {/* <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <FiX className="w-6 h-6" />
-          </button>
+          </button> */}
         </div>
 
         <div className="p-6">

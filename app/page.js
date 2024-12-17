@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
 import { SignInModal } from '../components/SignInModal';
+import { WelcomePopup } from '../components/WelcomePopup';
 
 const trendingSkills = [
   {
@@ -91,8 +92,52 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        // Fetch user data
+        if (session?.user?.email) {
+window.location.reload();        }
+      }
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [supabase]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return;
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', userEmail)
+          .single();
+
+        if (error) throw error;
+        setUserData(data);
+        
+        // Show welcome popup if first_time is true
+        if (data?.first_time === true) {
+          setShowWelcomePopup(true);
+        } else {
+          // Only reload for returning users
+          // window.location.reload();
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, [supabase]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -463,14 +508,31 @@ export default function Home() {
                     </div>
                   </div>
                   <button
-                    onClick={() => isStarted ?router.push('/learning'): handleStartQuest(skill)}
+                    onClick={() => {
+                      const userEmail = localStorage.getItem('userEmail');
+                      if (!userEmail) {
+                        setIsSignInModalOpen(true);
+                        return;
+                      }
+                      isStarted ? router.push('/learning') : handleStartQuest(skill);
+                    }}
                     className={`mt-4 w-full py-2 px-4 rounded-lg font-medium transition-all
                       ${isStarted
                         ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                         : 'bg-purple-600 text-white hover:bg-purple-700'
-                      }`}
+                      } ${!localStorage.getItem('userEmail') ? 'opacity-75' : ''}`}
+                    disabled={isGenerating}
                   >
-                    {isStarted ? 'Continue Learning' : 'Start Quest'}
+                    {isGenerating ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                        Generating Quest...
+                      </div>
+                    ) : isStarted ? (
+                      'Continue Quest'
+                    ) : (
+                      'Start Quest'
+                    )}
                   </button>
                 </motion.div>
               );
@@ -621,6 +683,15 @@ export default function Home() {
         )}
       </AnimatePresence>
       <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} />
+      {showWelcomePopup && (
+        <WelcomePopup
+          isOpen={showWelcomePopup}
+          onClose={() => {
+            setShowWelcomePopup(false);
+            window.location.reload(); // Reload after welcome popup is closed
+          }}
+        />
+      )}
     </Layout>
   );
 }
