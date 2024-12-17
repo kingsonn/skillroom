@@ -58,33 +58,46 @@ function parseJsonSafely(str) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { topic, userProfile, selectedSkill, selectedLesson } = body;
+    const { skillName} = body;
+console.log("this is sel", skillName)
+const tweaks= {
 
-    const tweaks = {
-      "Prompt-HIjZW": {
-        "template": "Create a lesson on the topic: {topic}, for a user who is developing skills in {skill_name} .\nuser's username is {username} refer to him with this username.\n The user's learning and cultural context and preferences are as follows: {user_context} in loaction {location}. \nThe user prefers the difficulty level for the lesson to be: {difficulty_level} and the pace of content to be: {pace}. \nThe user has the following professional profile : {professional}\nFor this topic user has given his mastery as {skill_mastery} (if left blank ignore)\nThe topic should follow the overall lesson objective that is: {objective} and should focus on practical skills \n Ensure the content is fun, engaging with generated relevant examples and gamified to enhance the learning experience for the user. With the user and cultural context ensure that the content is fun and gamified to engage and hook the users.\nOutput must only be the course content and in markdown language.",
-        "topic": topic,
-        "skill_name": selectedSkill,
-        "user_context": userProfile.learning_preferences || "working professional",
-        "location": userProfile.location || "mumbai",
-        "difficulty_level": userProfile.difficulty_level || "intermediate",
-        "pace": userProfile.learning_pace || "moderate",
-        "professional": userProfile.professional_profile || "working professional",
-        "objective": selectedLesson["practical outcome"],
-        "username": userProfile.username || userProfile.email.split('@')[0],
-        "skill_mastery": userProfile.skill_mastery || ""
-      },
-      "VertexAiModel-ICKBT": {
-        "credentials": "skillroom-444418-fb6450400aa8.json",
-        "location": "us-central1",
-        "model_name": "gemini-1.5-flash",
-        "temperature": 0,
-        "top_p": 0.95
-      }
-    };
 
+  "Prompt-zaxXP": {
+    "skill": skillName
+  },
+  "ChatOutput-qDr7C": {
+    "background_color": "",
+    "chat_icon": "",
+    "data_template": "{text}",
+    "input_value": "",
+    "sender": "Machine",
+    "sender_name": "AI",
+    "session_id": "",
+    "should_store_message": true,
+    "text_color": ""
+  },
+  "VertexAiModel-7nLOp": {
+    "input_value": "",
+    "location": "us-central1",
+    "max_output_tokens": null,
+    "max_retries": 1,
+    "model_name": "gemini-2.0-flash-exp",
+    "project": "",
+    "stream": false,
+    "system_message": "",
+    "temperature": 0,
+    "top_k": null,
+    "top_p": 0.95,
+    "verbose": false
+  },
+  "Prompt-w5t0p": {
+    "template": "Create skill structure for {skill}",
+    "skill": skillName
+  }
+}
     const endpoint = `/lf/${LANGFLOW_ID}/api/v1/run/${FLOW_ID}?stream=false`;
-    const url = `${LANGFLOW_BASE_URL}${endpoint}`;
+    const url = `https://api.langflow.astra.datastax.com/lf/42ddac8d-fc81-42af-bfd2-ca48f2d02204/api/v1/run/246c62db-afff-4912-b572-e01044a982c4?stream=false`;
     
     console.log('Calling Langflow API at:', url);
 
@@ -96,10 +109,10 @@ export async function POST(request) {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        input_value: topic,
+        input_value: skillName,
         input_type: 'chat',
         output_type: 'chat',
-        tweaks
+        tweaks: tweaks
       })
     });
 

@@ -24,23 +24,16 @@ export async function POST(request) {
 
     const tweaks = {
       "Prompt-HIjZW": {
-        "template": "Create a lesson on the topic: {topic}, for a user who is developing skills in {skill_name} .\nuser's username is {username} refer to him with this username.\n The user's learning and cultural context and preferences are as follows: {user_context} in loaction {location}. \nThe user prefers the difficulty level for the lesson to be: {difficulty_level} and the pace of content to be: {pace}. \nThe user has the following professional profile : {professional}\nFor this topic user has given his mastery as {skill_mastery} (if left blank ignore)\nThe topic should follow the overall lesson objective that is: {objective} and should focus on practical skills \n Ensure the content is fun, engaging with generated relevant examples and gamified to enhance the learning experience for the user. With the user and cultural context ensure that the content is fun and gamified to engage and hook the users.\nOutput must only be the course content and in markdown language.",
         "topic": topic,
         "skill_name": selectedSkill,
-        "user_context": userProfile.learning_preferences || "working professional",
+        "user_context": userProfile.preferences || "working professional",
         "location": userProfile.location || "mumbai",
         "difficulty_level": userProfile.difficulty_level || "intermediate",
-        "pace": userProfile.learning_pace || "moderate",
+        "pace": "moderate",
         "professional": userProfile.professional_profile || "working professional",
         "objective": selectedLesson["practical outcome"],
-        "username": userProfile.username || (userProfile.email ? userProfile.email.split('@')[0] : 'user'),
+        "username": userProfile.full_name || "Champ",
         "skill_mastery": userProfile.skill_mastery || ""
-      },
-      "ChatOpenAI-ICKBT": {
-        "model_name": "gpt-3.5-turbo",
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "streaming": false
       }
     };
 
@@ -53,7 +46,7 @@ export async function POST(request) {
       tweaks: { ...tweaks, "Prompt-HIjZW": { ...tweaks["Prompt-HIjZW"], template: '[TEMPLATE]' } }
     });
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_LANGFLOW_API_URL}?stream=false`, {
+    const response = await fetch(`https://api.langflow.astra.datastax.com/lf/42ddac8d-fc81-42af-bfd2-ca48f2d02204/api/v1/run/sf1?stream=false`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +94,7 @@ export async function POST(request) {
         { status: 500 }
       );
     }
-
+                             
     return NextResponse.json({ structure: content });
   } catch (error) {
     console.error('Error in langflow API route:', error);

@@ -1,5 +1,5 @@
 'use client';
-
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { FaTrophy, FaRocket, FaChartLine, FaStar, FaFire, FaMedal, FaCrown, FaBolt, FaUserNinja, FaLock, FaArrowRight } from 'react-icons/fa';
@@ -19,7 +19,6 @@ const trendingSkills = [
     category: 'Marketing',
     level: 'Beginner',
     icon: '🚀',
-    xpToUnlock: 500,
     progress: 25,
     rewards: ['Growth Hacker Badge', 'Analytics Pro']
   },
@@ -31,7 +30,6 @@ const trendingSkills = [
     category: 'Tech',
     level: 'Intermediate',
     icon: '🤖',
-    xpToUnlock: 1000,
     progress: 45,
     rewards: ['AI Pioneer Badge', 'GPT-4 Access']
   },
@@ -43,7 +41,6 @@ const trendingSkills = [
     category: 'Tech',
     level: 'Beginner to Advanced',
     icon: '📊',
-    xpToUnlock: 800,
     progress: 65,
     rewards: ['Data Wizard Badge', 'Tableau Pro']
   },
@@ -55,7 +52,6 @@ const trendingSkills = [
     category: 'Business',
     level: 'Intermediate',
     icon: '💡',
-    xpToUnlock: 750,
     progress: 85,
     rewards: ['Product Leader Badge', 'Agile Master']
   }
@@ -94,7 +90,9 @@ export default function Home() {
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -106,14 +104,35 @@ export default function Home() {
         }
 
         setIsLoggedIn(true);
-        const { data, error } = await supabase
+        // First, try to get the profile
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('skill_paths, progress, level, current_xp, achievements')
           .eq('email', userEmail)
           .single();
 
-        if (error) throw error;
-        setUserData(data);
+        if (profileError) {
+          // If profile doesn't exist, create one
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([
+              { 
+                email: userEmail,
+                current_xp: 500,
+                level: 1,
+                skill_paths: [],
+                progress: {},
+                achievements: []
+              }
+            ])
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          setUserData(newProfile);
+        } else {
+          setUserData(profile);
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -143,6 +162,7 @@ export default function Home() {
 
   const handleStartQuest = async (skill) => {
     try {
+      setIsGenerating(true);
       console.log('Starting quest for skill:', skill.name);
       const newModules = await langflowClient.generateSkillStructure(skill.name);
       
@@ -183,11 +203,34 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error updating skill paths:', error);
+    } finally {
+      router.push('/learning');
+      setIsGenerating(false);
     }
   };
 
   return (
     <Layout>
+      {/* Loading Screen */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 text-center">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Generating Your Quest</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                Please wait while we create a personalized learning journey for you...
+              </p>
+              <div className="flex items-center justify-center space-x-2 text-purple-500">
+                <span className="animate-pulse">●</span>
+                <span className="animate-pulse delay-100">●</span>
+                <span className="animate-pulse delay-200">●</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -394,10 +437,8 @@ export default function Home() {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-3xl mb-2">{skill.icon}</span>
-                      <h3 className="text-xl font-bold mt-2">{skill.name}</h3>
-                    </div>
-                    <div className="flex flex-col items-end">
+                      <span className="text-2xl mb-2">{skill.icon}</span>
+                      <h3 className="text-lg font-semibold mt-2">{skill.name}</h3>
                       <span className="text-green-500 font-semibold">{skill.growth}</span>
                       {isStarted && (
                         <span className="text-xs text-purple-500 mt-1">In Progress</span>
@@ -421,21 +462,12 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  {!isStarted && (
-                    <div className="mt-4 text-sm text-gray-500">
-                      <FaUserNinja className="inline mr-1" />
-                      {skill.xpToUnlock} XP to unlock
-                    </div>
-                  )}
                   <button
-                    onClick={() => handleStartQuest(skill)}
-                    disabled={!isStarted && xpPoints < skill.xpToUnlock}
+                    onClick={() => isStarted ?router.push('/learning'): handleStartQuest(skill)}
                     className={`mt-4 w-full py-2 px-4 rounded-lg font-medium transition-all
                       ${isStarted
                         ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                        : xpPoints >= skill.xpToUnlock
-                        ? 'bg-purple-600 text-white hover:bg-purple-700'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-purple-600 text-white hover:bg-purple-700'
                       }`}
                   >
                     {isStarted ? 'Continue Learning' : 'Start Quest'}

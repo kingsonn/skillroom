@@ -5,7 +5,7 @@ import Layout from "../../components/Layout";
 import { FiArrowLeft, FiPlay, FiBook, FiCheckCircle, FiLock, FiStar, FiAward, FiX, FiArrowRight, FiInfo } from 'react-icons/fi';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { marked } from 'marked';
-
+import Chatbot from "../../components/Chatbot";
 export default function LearningPage() {
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you with your learning journey?", isBot: true },
@@ -868,14 +868,14 @@ export default function LearningPage() {
           )}
 
           {/* Fixed Chat Bot */}
-          <div className="hidden lg:block w-96 fixed top-16 right-0 bottom-0 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          {/* <div className="hidden lg:block w-96 fixed top-16 right-0 bottom-0 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"> */}
+            {/* <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Learning Assistant</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">Ask me anything about your courses</p>
-            </div>
+            </div> */}
             
             {/* Chat Messages */}
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto h-[calc(100vh-13rem)]">
+            {/* <div className="flex-1 p-4 space-y-4 overflow-y-auto h-[calc(100vh-13rem)]">
               {messages.map((message, index) => (
                 <div key={index} className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}>
                   <div className={`max-w-[80%] p-3 rounded-lg ${
@@ -887,10 +887,12 @@ export default function LearningPage() {
                   </div>
                 </div>
               ))}
-            </div>
-
+            </div> */}
+<Chatbot topic={selectedLesson?.topics?.[currentTopicIndex] || ''} 
+  studyMaterial={currentTopicContent || ''}
+/>
             {/* Message Input */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            {/* <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <form onSubmit={handleSendMessage} className="flex gap-2">
                 <input
                   type="text"
@@ -907,7 +909,7 @@ export default function LearningPage() {
                 </button>
               </form>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </Layout>
