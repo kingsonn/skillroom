@@ -112,8 +112,11 @@ window.location.reload();        }
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userEmail = localStorage.getItem('userEmail');
-        if (!userEmail) return;
+        const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null;
+        if (!userEmail) {
+          setIsLoggedIn(false);
+          return;
+        }
 
         const { data, error } = await supabase
           .from('profiles')
@@ -142,7 +145,7 @@ window.location.reload();        }
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userEmail = localStorage.getItem('userEmail');
+        const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null;
         if (!userEmail) {
           setIsLoggedIn(false);
           return;

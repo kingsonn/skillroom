@@ -14,17 +14,18 @@ export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
-  const [userEmail, setUserEmail] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('userEmail');
-    }
-    return null;
-  });
+  const [userEmail, setUserEmail] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
+    // Set initial email from localStorage
+    const storedEmail = localStorage.getItem('userEmail');
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();

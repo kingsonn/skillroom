@@ -601,9 +601,9 @@ export default function LearningPage() {
                           <h3 className="text-xl font-semibold">{skill.name ||skill?.skill.name}</h3>
                           <FiArrowRight className="text-xl text-purple-500" />
                         </div>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {skill.skill.description}
-                        </p>
+                        {/* <p className="text-gray-600 dark:text-gray-400 mb-4">
+                          {skill.skill.description || skill.description || skill?.skill?.outcome || skill?.outcome}
+                        </p> */}
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <span className="flex items-center">
                             <FiBook className="mr-1" /> {skill?.modules?.length || skill?.skill.modules.length} Modules

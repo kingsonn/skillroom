@@ -98,7 +98,8 @@ export function WelcomePopup({ isOpen, onClose }) {
     e.preventDefault();
     
     try {
-     
+      const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null;
+      if (!userEmail) return;
 
       const { error } = await supabase
         .from('profiles')
@@ -116,7 +117,7 @@ export function WelcomePopup({ isOpen, onClose }) {
             career_goals: formData.careerGoals},
           
         })
-        .eq('email', localStorage.getItem('userEmail'));
+        .eq('email', userEmail);
 
       if (error) throw error;
       
