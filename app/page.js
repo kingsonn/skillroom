@@ -93,6 +93,7 @@ export default function Home() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [hasUserEmail, setHasUserEmail] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -187,6 +188,10 @@ window.location.reload();        }
     };
 
     fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    setHasUserEmail(!!localStorage.getItem('userEmail'));
   }, []);
 
   const currentLevel = userData?.level || 1;
@@ -512,8 +517,7 @@ window.location.reload();        }
                   </div>
                   <button
                     onClick={() => {
-                      const userEmail = localStorage.getItem('userEmail');
-                      if (!userEmail) {
+                      if (!hasUserEmail) {
                         setIsSignInModalOpen(true);
                         return;
                       }
@@ -523,7 +527,7 @@ window.location.reload();        }
                       ${isStarted
                         ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                         : 'bg-purple-600 text-white hover:bg-purple-700'
-                      } ${!localStorage.getItem('userEmail') ? 'opacity-75' : ''}`}
+                      } ${!hasUserEmail ? 'opacity-75' : ''}`}
                     disabled={isGenerating}
                   >
                     {isGenerating ? (
