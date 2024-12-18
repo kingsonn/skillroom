@@ -6,10 +6,13 @@ import { FiArrowLeft, FiPlay, FiBook, FiCheckCircle, FiLock, FiStar, FiAward, Fi
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { marked } from 'marked';
 import Chatbot from "../../components/Chatbot";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 export default function LearningPage() {
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you with your learning journey?", isBot: true },
   ]);
+  const [URL, SetURL] = useState('/api/langflow/generate');
   const [newMessage, setNewMessage] = useState('');
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [moduleData, setModuleData] = useState(null);
@@ -158,8 +161,12 @@ export default function LearningPage() {
   const calculateModuleProgress = (moduleName) => {
     if (!userProgress || !selectedSkill) return 0;
     
-    const module = moduleData?.find(skill => skill.name === selectedSkill)
-      ?.modules.find(m => m.name === moduleName);
+    const module = moduleData?.find(skill => 
+      skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
+    )?.modules?.find(m => m.name === moduleName) || 
+    moduleData?.find(skill => 
+      skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
+    )?.skill?.modules?.find(m => m.name === moduleName);
     
     if (!module) return 0;
     
@@ -285,11 +292,11 @@ export default function LearningPage() {
 
       console.log('Generating content for:', {
         topic,
-        skill: selectedSkill,
+        skill: selectedSkill, 
         lesson: selectedLesson?.name
       });
 
-      const response = await fetch('/api/langflow/generate', {
+      const response = await fetch(`/api/langflow/${selectedSkill==="Digital Marketing"?"digital":"generate"}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -350,7 +357,11 @@ export default function LearningPage() {
       return content;
     }
   };
-
+  const cleanupContent = (content) => {
+    if (!content) return '';
+    const firstHeadingMatch = content.match(/^#+ .+$/m);
+    return firstHeadingMatch ? content.substring(content.indexOf(firstHeadingMatch[0])) : content;
+  };
   useEffect(() => {
     if (selectedLesson && selectedLesson.topics[currentTopicIndex]) {
       generateTopicContent(selectedLesson.topics[currentTopicIndex]);
@@ -400,7 +411,7 @@ export default function LearningPage() {
                   {/* Topic Content */}
                   <div className="bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20 rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
                     {/* Progress Bar */}
-                    <div className="mb-6">
+                    {/* <div className="mb-6">
                       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                         <span>Progress</span>
                         <span>{Math.round(((currentTopicIndex + 1) / selectedLesson.topics.length) * 100)}%</span>
@@ -411,7 +422,7 @@ export default function LearningPage() {
                           style={{ width: `${((currentTopicIndex + 1) / selectedLesson.topics.length) * 100}%` }}
                         />
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Topic Header */}
                     <div className="flex items-center justify-between mb-8">
@@ -445,45 +456,87 @@ export default function LearningPage() {
                         <p>{markdownError}</p>
                       </div>
                     ) : (
-                      <div className="prose prose-lg dark:prose-invert max-w-none animate-fade-in">
-                        <div 
-                          dangerouslySetInnerHTML={{ 
-                            __html: marked(formatMarkdownContent(currentTopicContent)) 
-                          }} 
-                          className="markdown-content"
-                        />
-                        
-                        {/* Interactive Elements */}
-                        <div className="mt-8 pt-6 border-t border-purple-100 dark:border-purple-800">
-                          <div className="flex items-center justify-between">
-                            <button 
-                              onClick={() => setCurrentTopicIndex(Math.max(0, currentTopicIndex - 1))}
-                              disabled={currentTopicIndex === 0}
-                              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
-                                currentTopicIndex === 0 
-                                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800' 
-                                : 'hover:bg-purple-100 dark:hover:bg-purple-900/30'
-                              }`}
-                            >
-                              <FiArrowLeft className="mr-2" />
-                              Previous Topic
-                            </button>
-                            
-                            <button 
-                              onClick={() => setCurrentTopicIndex(Math.min(selectedLesson.topics.length - 1, currentTopicIndex + 1))}
-                              disabled={currentTopicIndex === selectedLesson.topics.length - 1}
-                              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
-                                currentTopicIndex === selectedLesson.topics.length - 1
-                                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800'
-                                : 'hover:bg-purple-100 dark:hover:bg-purple-900/30'
-                              }`}
-                            >
-                              Next Topic
-                              <FiArrowRight className="ml-2" />
-                            </button>
+                      <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      className="prose prose-purple dark:prose-invert max-w-none"
+                      components={{
+                        a: ({node, ...props}) => {
+                          // YouTube video link
+                          const youtubeMatch = props.href?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+                          if (youtubeMatch) {
+                            return (
+                              <div className="my-4 aspect-video rounded-lg overflow-hidden shadow-md">
+                                <iframe
+                                  width="100%"
+                                  height="100%"
+                                  src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full"
+                                />
+                              </div>
+                            );
+                          }
+                    
+                          // Image link
+                          const imageMatch = props.href?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                          if (imageMatch) {
+                            return (
+                              <div className="my-4">
+                                <img
+                                  src={props.href}
+                                  alt={props.children}
+                                  className="rounded-lg shadow-md w-full object-cover max-h-[400px]"
+                                  loading="lazy"
+                                />
+                              </div>
+                            );
+                          }
+                    
+                          // Regular link
+                          return (
+                            <a 
+                              {...props} 
+                              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors" 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                            />
+                          );
+                        },
+                        blockquote: ({node, children}) => (
+                          <div className="my-4 border-l-4 border-purple-500 pl-4 italic bg-purple-50 dark:bg-purple-900/20 p-4 rounded-r-lg">
+                            {children}
                           </div>
-                        </div>
-                      </div>
+                        ),
+                        code: ({node, inline, children}) => (
+                          inline ? 
+                            <code className="bg-purple-100 dark:bg-purple-900/30 px-1 py-0.5 rounded text-sm">{children}</code> :
+                            <div className="my-4 bg-gray-900 rounded-lg overflow-hidden">
+                              <pre className="p-4 text-sm text-gray-100 overflow-x-auto">
+                                <code>{children}</code>
+                              </pre>
+                            </div>
+                        ),
+                        h1: ({node, ...props}) => (
+                          <h1 {...props} className="text-3xl font-bold mb-4 text-gray-900 dark:text-white" />
+                        ),
+                        h2: ({node, ...props}) => (
+                          <h2 {...props} className="text-2xl font-semibold mb-3 text-gray-800 dark:text-gray-100" />
+                        ),
+                        h3: ({node, ...props}) => (
+                          <h3 {...props} className="text-xl font-medium mb-2 text-gray-700 dark:text-gray-200" />
+                        ),
+                        ul: ({node, ...props}) => (
+                          <ul {...props} className="list-disc list-inside space-y-2 my-4" />
+                        ),
+                        ol: ({node, ...props}) => (
+                          <ol {...props} className="list-decimal list-inside space-y-2 my-4" />
+                        )
+                      }}
+                    >
+    {cleanupContent(currentTopicContent)}
+                    </ReactMarkdown>
                     )}
                   </div>
 

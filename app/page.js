@@ -94,6 +94,8 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [hasUserEmail, setHasUserEmail] = useState(false);
+  const [customSkill, setCustomSkill] = useState('');
+  const [isGeneratingCourse, setIsGeneratingCourse] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -189,10 +191,10 @@ window.location.reload();        }
 
     fetchUserData();
   }, []);
-
   useEffect(() => {
     setHasUserEmail(!!localStorage.getItem('userEmail'));
   }, []);
+ 
 
   const currentLevel = userData?.level || 1;
   const xpPoints = userData?.current_xp || 0;
@@ -212,7 +214,7 @@ window.location.reload();        }
     });
     setTimeout(() => setShowLevelUp(false), 3000);
   };
-
+  
   const handleStartQuest = async (skill) => {
     try {
       setIsGenerating(true);
@@ -231,7 +233,7 @@ window.location.reload();        }
         console.error('Error fetching profile:', error);
         throw error;
       }
-
+   
       const currentSkills = data?.skill_paths || [];
       const currentModules = data?.modules || [];
 
@@ -260,6 +262,30 @@ window.location.reload();        }
       router.push('/learning');
       setIsGenerating(false);
     }
+  };
+
+  const handleCustomSkillSubmit = async (e) => {
+    e.preventDefault();
+    if (!customSkill.trim()) return;
+
+    if (!isLoggedIn) {
+      setIsSignInModalOpen(true);
+      return;
+    }
+ await handleStartQuest({ name: customSkill });
+
+  // setIsGeneratingCourse(false);
+  setCustomSkill('');  
+
+    // setIsGeneratingCourse(true);
+    // try {
+    //   router.push(`/learning?skill=${encodeURIComponent(customSkill.trim())}`);
+    // } catch (error) {
+    //   console.error('Error generating course:', error);
+    // } finally {
+    //   setIsGeneratingCourse(false);
+    //   setCustomSkill('');
+    // }
   };
 
   return (
@@ -545,7 +571,68 @@ window.location.reload();        }
               );
             })}
           </div>
+{/* Custom Skill Section */}
+<section className="mb-10 mt-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8 text-white">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-start justify-between">
+                <div className="space-y-4">
+                  <h2 className="text-3xl font-bold">Create Your Own Learning Journey</h2>
+                  <p className="text-blue-100 text-lg">
+                    Want to learn something specific? Enter any skill and get a personalized learning path instantly.
+                  </p>
+                </div>
+                <div className="hidden lg:block">
+                  <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center">
+                    <FaBolt className="w-12 h-12 text-yellow-300" />
+                  </div>
+                </div>
+              </div>
 
+              <form onSubmit={handleCustomSkillSubmit} className="mt-8">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={customSkill}
+                      onChange={(e) => setCustomSkill(e.target.value)}
+                      placeholder="Enter any skill (e.g., Python Development, Content Writing, etc.)"
+                      className="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-blue-100 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isGeneratingCourse || !customSkill.trim()}
+                    className="px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    {isGeneratingCourse ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Generate Course</span>
+                        <FaArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <span className="text-sm text-blue-100">Popular searches:</span>
+                {['Web Development', 'Content Marketing', 'UX Design', 'Data Science'].map((skill) => (
+                  <button
+                    key={skill}
+                    onClick={() => setCustomSkill(skill)}
+                    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-sm text-blue-100 transition-all"
+                  >
+                    {skill}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
           {/* Daily Challenges Section */}
           <div className="mt-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center">
@@ -595,6 +682,8 @@ window.location.reload();        }
               </div>
             </div>
           </div>
+
+          
         </div>
 
         {/* Right Sidebar - Achievements */}
