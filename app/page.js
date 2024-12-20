@@ -498,7 +498,7 @@ window.location.reload();        }
         <div className="md:col-span-8">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <FaBolt className="mr-2 text-yellow-400" /> 
-            {isLoggedIn ? 'Your Learning Journey' : 'Available Skills'}
+            {isLoggedIn ? 'Top trending skills' : 'Available Skills'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {trendingSkills.map((skill) => {
