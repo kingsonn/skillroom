@@ -442,7 +442,7 @@ window.location.reload();        }
                   <div className="flex gap-4">
                     <button 
                       onClick={() => setIsSignInModalOpen(true)}
-                      className="inline-flex items-center px-8 py-3 text-base font-semibold rounded-full bg-white hover:bg-gray-50 text-purple-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      className="inline-flex items-center px-8 py-3 text-base font-semibold rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-purple-600 dark:text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                       Sign In
                     </button>
@@ -510,33 +510,33 @@ window.location.reload();        }
                   key={skill.id}
                   whileHover={{ scale: 1.02 }}
                   onHoverStart={() => handleSkillHover(skill)}
-                  className={`bg-white p-6 rounded-xl shadow-lg border transition-all ${
-                    isStarted ? 'border-purple-300' : 'border-gray-100'
+                  className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border transition-all ${
+                    isStarted ? 'border-purple-300 dark:border-purple-500' : 'border-gray-100 dark:border-gray-700'
                   }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
                       <span className="text-2xl mb-2">{skill.icon}</span>
-                      <h3 className="text-lg font-semibold mt-2">{skill.name}</h3>
-                      <span className="text-green-500 font-semibold">{skill.growth}</span>
+                      <h3 className="text-lg font-semibold mt-2 dark:text-white">{skill.name}</h3>
+                      <span className="text-green-500 dark:text-green-400 font-semibold">{skill.growth}</span>
                       {isStarted && (
-                        <span className="text-xs text-purple-500 mt-1">In Progress</span>
+                        <span className="text-xs text-purple-500 dark:text-purple-400 mt-1">In Progress</span>
                       )}
                     </div>
                   </div>
-                  <p className="text-gray-600 mt-2">{skill.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300 mt-2">{skill.description}</p>
                   <div className="mt-4">
-                    <div className="flex justify-between text-sm text-gray-500 mb-1">
+                    <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
                       <span>Progress</span>
                       <span>{progress}%</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 0.5 }}
                         className={`h-full rounded-full ${
-                          isStarted ? 'bg-purple-500' : 'bg-gray-300'
+                          isStarted ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       />
                     </div>
@@ -551,14 +551,14 @@ window.location.reload();        }
                     }}
                     className={`mt-4 w-full py-2 px-4 rounded-lg font-medium transition-all
                       ${isStarted
-                        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
+                        ? 'bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-700'
+                        : 'bg-purple-600 dark:bg-purple-800 text-white hover:bg-purple-700 dark:hover:bg-purple-600'
                       } ${!hasUserEmail ? 'opacity-75' : ''}`}
                     disabled={isGenerating}
                   >
                     {isGenerating ? (
                       <div className="flex items-center justify-center">
-                        <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                        <div className="w-5 h-5 border-t-2 border-b-2 border-white dark:border-gray-800 rounded-full animate-spin mr-2"></div>
                         Generating Quest...
                       </div>
                     ) : isStarted ? (
@@ -638,20 +638,20 @@ window.location.reload();        }
             <h2 className="text-2xl font-bold mb-4 flex items-center">
               <FaFire className="mr-2 text-orange-500" /> Daily Challenges
             </h2>
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {dailyChallenges.map((challenge) => (
                   <div 
                     key={challenge.id} 
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
                     <div className="flex items-center">
-                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                      <div className="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
                         <FaBolt className="text-purple-500" />
                       </div>
-                      <span className="font-medium text-gray-700">{challenge.name}</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{challenge.name}</span>
                     </div>
-                    <span className="text-sm font-semibold text-purple-500">+{challenge.xp} XP</span>
+                    <span className="text-sm font-semibold text-purple-500 dark:text-purple-400">+{challenge.xp} XP</span>
                   </div>
                 ))}
               </div>
@@ -663,18 +663,18 @@ window.location.reload();        }
             <h2 className="text-2xl font-bold mb-4 flex items-center">
               <FaCrown className="mr-2 text-yellow-500" /> Top Learners
             </h2>
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {topLearners.map((learner) => (
                   <div 
                     key={learner.id} 
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
                     <div className="flex items-center">
                       <span className="text-2xl mr-3">{learner.badge}</span>
                       <div>
-                        <span className="font-medium text-gray-700">{learner.name}</span>
-                        <div className="text-sm text-gray-500">{learner.xp} XP</div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{learner.name}</span>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{learner.xp} XP</div>
                       </div>
                     </div>
                   </div>
@@ -692,7 +692,7 @@ window.location.reload();        }
             <FaTrophy className="mr-2 text-yellow-400" /> 
             {isLoggedIn ? 'Your Achievements' : 'Achievements to Earn'}
           </h2>
-          <div className="bg-white rounded-xl shadow-lg p-6 space-y-4 sticky top-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-4 sticky top-4">
             {isLoggedIn ? (
               // Logged in user achievements
               userAchievements.length > 0 ? (
@@ -702,20 +702,20 @@ window.location.reload();        }
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-purple-50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-600 transition-colors"
                   >
-                    <div className="w-12 h-12 flex items-center justify-center bg-purple-100 rounded-lg">
+                    <div className="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-800 rounded-lg">
                       <span className="text-2xl">{achievement.icon || '🏆'}</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">{achievement.name}</h3>
-                      <p className="text-sm text-gray-600">Earned on {achievement.earnedDate || 'Recently'}</p>
+                      <h3 className="font-semibold text-gray-800 dark:text-gray-300">{achievement.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Earned on {achievement.earnedDate || 'Recently'}</p>
                     </div>
                   </motion.div>
                 ))
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <FaTrophy className="text-4xl mx-auto mb-4 text-gray-300" />
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <FaTrophy className="text-4xl mx-auto mb-4 text-gray-300 dark:text-gray-500" />
                   <p className="font-medium">No achievements yet</p>
                   <p className="text-sm mt-2">Complete quests to earn achievements!</p>
                 </div>
@@ -729,28 +729,28 @@ window.location.reload();        }
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 relative overflow-hidden group"
+                    className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 relative overflow-hidden group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg shadow-sm relative">
+                    <div className="w-12 h-12 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow-sm relative">
                       <span className="text-2xl filter grayscale group-hover:filter-none transition-all">
                         {achievement.icon}
                       </span>
-                      <div className="absolute inset-0 bg-gray-200/50 rounded-lg group-hover:bg-transparent transition-colors"></div>
+                      <div className="absolute inset-0 bg-gray-200/50 dark:bg-gray-600/50 rounded-lg group-hover:bg-transparent transition-colors"></div>
                     </div>
                     <div className="relative">
-                      <h3 className="font-semibold text-gray-800">{achievement.name}</h3>
-                      <p className="text-sm text-gray-600">{achievement.description}</p>
+                      <h3 className="font-semibold text-gray-800 dark:text-gray-300">{achievement.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{achievement.description}</p>
                     </div>
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FaLock className="text-gray-400" />
+                      <FaLock className="text-gray-400 dark:text-gray-500" />
                     </div>
                   </motion.div>
                 ))}
                 <div className="text-center pt-4">
                   <Link
                     href="/auth"
-                    className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+                    className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-500 font-medium"
                   >
                     <span>Sign up to start earning</span>
                     <FaArrowRight className="text-sm" />
@@ -771,7 +771,7 @@ window.location.reload();        }
             exit={{ opacity: 0, scale: 0.5 }}
             className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
           >
-            <div className="bg-white p-8 rounded-xl text-center">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl text-center">
               <h2 className="text-2xl font-bold mb-4">🎉 Level Up!</h2>
               <p>You've reached Level {currentLevel + 1}</p>
             </div>
