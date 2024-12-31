@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FaTrophy, FaMedal, FaChartLine, FaStar, FaFire, FaBrain, FaCertificate, FaLightbulb, FaGem, FaCrown, FaHeart, FaShieldAlt, FaBolt } from 'react-icons/fa';
+import { FaTrophy, FaMedal, FaChartLine, FaStar, FaFire, FaBrain, FaCertificate, FaLightbulb, FaGem, FaCrown, FaHeart, FaShieldAlt, FaBolt, FaDownload } from 'react-icons/fa';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Layout from '../../components/Layout';
@@ -15,6 +15,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { downloadCertificate } from '../../components/CertificateGenerator';
 
 ChartJS.register(
   RadialLinearScale,
@@ -218,7 +219,7 @@ export default function ProfilePage() {
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
               <div className="absolute inset-0" style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2H6zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
                 backgroundSize: '30px 30px'
               }} />
             </div>
@@ -434,14 +435,18 @@ export default function ProfilePage() {
               {userStats.certificates.map((cert) => (
                 <motion.div
                   key={cert.id}
-                  className="group relative"
+                  className="group relative cursor-pointer"
                   whileHover={{ 
                     scale: 1.03,
                     transition: { duration: 0.2 }
                   }}
+                  onClick={() => {
+                    console.log('Certificate card clicked', { cert, userEmail });
+                    downloadCertificate(cert, userEmail);
+                  }}
                 >
                   {/* Card Container */}
-                  <div className="relative bg-gradient-to-br from-white dark:from-gray-900 to-gray-50 dark:to-gray-800 rounded-2xl overflow-hidden shadow-xl h-[450px] border border-gray-200 dark:border-gray-700">
+                  <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl overflow-hidden shadow-xl h-[450px] border border-gray-200 dark:border-gray-700">
                     {/* Animated Background */}
                     <div className="absolute inset-0 opacity-30">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent opacity-10 animate-shimmer" />
@@ -472,10 +477,14 @@ export default function ProfilePage() {
                       <div className="flex-grow flex items-center justify-center py-8">
                         <div className="relative">
                           <div className={`absolute inset-0 bg-gradient-to-br ${cert.badgeColor} rounded-xl opacity-20 blur-xl animate-pulse`} />
-                          <div className="relative w-32 h-32">
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 dark:from-gray-800 to-gray-200 dark:to-gray-700 rounded-2xl transform rotate-45" />
-                            <div className="absolute inset-0 flex items-center justify-center text-6xl transform -rotate-45">
-                              {cert.icon}
+                          <div className="relative w-64 h-40">
+                            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <img 
+                                src="/certificate-template.png" 
+                                alt="Certificate"
+                                className="w-full h-full object-contain p-2"
+                              />
                             </div>
                           </div>
                         </div>
@@ -495,6 +504,12 @@ export default function ProfilePage() {
                               {skill}
                             </span>
                           ))}
+                        </div>
+                        
+                        {/* Download Indicator */}
+                        <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
+                          <FaDownload className="text-sm" />
+                          Click to download
                         </div>
                       </div>
 
