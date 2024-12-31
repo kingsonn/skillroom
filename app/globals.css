@@ -331,3 +331,132 @@ a {
 .interactive-button:active:not(:disabled) {
   @apply scale-95;
 }
+
+/* Game Font and Custom Styles */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.game-font {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixel-borders {
+  border-image-slice: 2;
+  border-image-width: 2;
+  border-image-repeat: stretch;
+  border-image-source: url('data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8" ?><svg width="8" height="8" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 h1 v1 h-1 v-1 z M4 1 h1 v1 h-1 v-1 z M2 2 h1 v1 h-1 v-1 z M5 2 h1 v1 h-1 v-1 z M1 3 h1 v1 h-1 v-1 z M6 3 h1 v1 h-1 v-1 z M1 4 h1 v1 h-1 v-1 z M6 4 h1 v1 h-1 v-1 z M2 5 h1 v1 h-1 v-1 z M5 5 h1 v1 h-1 v-1 z M3 6 h1 v1 h-1 v-1 z M4 6 h1 v1 h-1 v-1 z" fill="currentColor" /></svg>');
+}
+
+.game-card {
+  position: relative;
+  background: white;
+  border: 2px solid #4a5568;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 4px 4px 0 #2d3748;
+  transition: all 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #2d3748;
+}
+
+.stat-bar {
+  height: 20px;
+  background: repeating-linear-gradient(
+    45deg,
+    #2d3748,
+    #2d3748 10px,
+    #4a5568 10px,
+    #4a5568 20px
+  );
+  border: 2px solid #1a202c;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    #48bb78 25%,
+    #38a169 25%,
+    #38a169 50%,
+    #48bb78 50%,
+    #48bb78 75%,
+    #38a169 75%
+  );
+  background-size: 20px 20px;
+  animation: move-stripes 1s linear infinite;
+}
+
+@keyframes move-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 0;
+  }
+}
+
+.pixel-button {
+  background: #4a5568;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  position: relative;
+  transition: all 0.1s ease;
+}
+
+.pixel-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255,255,255,0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0.1) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 3px 3px;
+  pointer-events: none;
+}
+
+.pixel-button:active {
+  transform: translateY(2px);
+}
+
+.achievement-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #e60073,
+                0 0 20px #e60073,
+                0 0 25px #e60073,
+                0 0 30px #e60073,
+                0 0 35px #e60073;
+  }
+  to {
+    box-shadow: 0 0 10px #fff,
+                0 0 20px #fff,
+                0 0 30px #ff4da6,
+                0 0 40px #ff4da6,
+                0 0 50px #ff4da6,
+                0 0 60px #ff4da6,
+                0 0 70px #ff4da6;
+  }
+}

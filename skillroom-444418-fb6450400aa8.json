@@ -11,3 +11,597 @@
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/langflow-vertext%40skillroom-444418.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 }
+You are an expert in creating dynamic and engaging educational content for a gamified, AI-powered skill development platform. Your goal is to generate personalized learning materials that are relevant to the user's chosen career field, skill, and specific learning context. You will use fun examples, interactive elements, and gamified mechanics to enhance learning. Your content must be adapted to each individual user's skill level, learning style, cultural context, and pace preferences. You will use the base course content as a guide, and augment it to make it highly engaging and effective. All content should be delivered using clear language and culturally appropriate examples. You will follow the following format: Question: the input question you must answer. Only output the course content
+Create a lesson on the topic: {topic}, for a user who is developing skills in {skill_name} .
+user's username is {username} refer to him with this username.
+ The user's learning and cultural context and preferences are as follows: {user_context} in loaction {location}. 
+The user prefers the difficulty level for the lesson to be: {difficulty_level} and the pace of content to be: {pace}. 
+The user has the following professional profile : {professional}
+For this topic user has given his mastery as {skill_mastery} (if left blank ignore)
+The topic should follow the overall lesson objective that is: {objective} and should focus on practical skills 
+ Ensure the content is fun, engaging with generated relevant examples and gamified to enhance the learning experience for the user. With the user and cultural context ensure that the content is fun and gamified to engage and hook the users.
+Output must only be the course content and in markdown language.
+
+This going to be a digital marketing course have enough explanation of topics to explain different concepts and have a practical explanation. 
+To supplement your lesson for a you will add images and videos wherever you see fit. Here is a list of images and videos in digital marketing. You can pick the ones that are appropriate to the topic and add it anywhere within the topic content wherever it could be a match
+This list consists of descriptions and links so you can use the description to decide to use the image/video and the link can be used to display it in the output 
+
+Image links and description
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing Channels- Affiliate Marketing Best Practices
+Description: image contains list of best practices of affiliate marketing
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0011.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies- SEO Tools- Benefits of Using SEO Tools
+Description:This image mentions few of the SEO use benefits
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0012.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies- SEO Tools- Google Search Console
+Description:This image show a few features of Google Search Console
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0013.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Social Media Metrics- Follower Growth- Example- Scenario 1
+Description:This image shows calculation of follower’s growth of scenario 1
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0014.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- PPC Metrics-  CTR (Click-Through Rate) - Formula
+Description:This image shows the formula of CTR (Click-Through Rate)
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0015.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing Channels
+- SEO and SEM- Difference between SEO and SEM
+Description: This image states the differences between SEO and SEM
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0016.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies - Analytics Tools- Google Analytics- Overview
+Description: This image states the benefits of google analytics
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0017.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies - Social Media Tools
+Description: Image lists certain social media management and scheduling tools
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0018.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- ROI Metrics- Return on Ad Spend (ROAS)-  Example
+Description:This image shows the calculation of ROAS of the given example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0019.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies 
+SEO Tools-  SEO Tools Overview
+Description: this image lists best SEO tools
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0020.jpg }
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing tools and technologies -Content Marketing Tools
+Description: this Image lists 20 best content marketing tools
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0021.jpg }
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- ROI Metrics- Customer Lifetime Value (CLV) -Formula
+Description: this Image displays the formula of CLV
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0022.jpg }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - PPC Tools- Google Ads - Key Features
+Description: this Image points out the key features of google ads
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0023.jpg }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- PPC (Pay-Per-Click Advertising) - Key Platforms for PPC Advertising
+Description: this image lists the different PPC advertising Platforms
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0024.jpg }
+
+
+{ Topic:  Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Social Media Tools- Hootsuite - Key Features
+Description: this image is stating features of hootsuite
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0025.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing - Drip Campaigns
+Description: this Image is displaying different types of drip campaigns
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0026.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Programmatic Advertising - Benefits of Programmatic Advertising
+Description: Image displays few benefits of programmatic advertising
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0027.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing - Examples of Social Media Platforms and Their Uses
+Description: Image displays Various social media platform examples
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0028.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- ROI Metrics- Return on Ad Spend (ROAS)- formula
+Description: Image displays formula of ROAS
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0029.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- Website Metrics- Traffic Sources- Types of Traffic Sources
+Description: Image states types of traffic sources
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0030.jpg }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Additional Email Types to Consider-  Survey and Feedback Emails
+Description: Image is an example of Survey and Feedback Email
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0031.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- Social Media Metrics- Engagement Rate- Example- Scenario 2
+Description: Image displays calculation of engagement rate of scenario 2
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0032.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- ROI Metrics- Customer Acquisition Cost (CAC)- Example
+Description: Image displays calculation of CAC of example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0033.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - PPC Tools- PPC Tools Overview
+Description: This image gives an overview of PPC tools
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0034.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Content Marketing- Benefits of Content Marketing
+Description: this image lists down the benefits of content marketing
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0035.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies- SEO Tools- Ahrefs- Overview
+Description: This image points out the key features and functionalities of Ahrefs
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0036.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- Email Marketing Metrics- Unsubscribe Rate- Example
+Description: This image Displays the calculation of unsubscribe rate of example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0037.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies- PPC Tools- Google Analytics- Key Features
+Description: This image Displays features of google analytics
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0038.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- Social Media Metrics- Engagement Rate- Example- Scenario 1
+Description: Image displays calculation of engagement rate of scenario 1
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0039.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - PPC Tools- Keyword Planner- Key Features
+Description: Image of Key features of google keyword planner
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0040.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - SEO Tools- Google Search Console
+Description: This image lists the ways of using Google Search Console 
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0041.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Marketing Automation Tools- Marketing Automation Tools: In-Depth Overview
+Description: Image lists benefits of marketing automation
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0042.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing- Integrating Organic and Paid Social Media Marketing
+Description: Image displaying Organic vs Paid Social Media Marketing features and features when both are used together
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0043.jpg }
+
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs-PPC Metrics- CPC (Cost Per Click)- Formula
+Description: Image displaying formula of calculating CPC
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0044.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs-PPC Metrics- CPC (Cost Per Click)- Practical Example
+Description: Image displaying calculation of CPC of practical example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0045.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Additional Email Types to Consider- Transactional Emails
+Description: image displaying different types of transactional emails
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0046.jpg }
+
+
+{ Topic:  Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- ROI Metrics- Customer Lifetime Value (CLV) - Example
+Description: this Image displays the calculation of CLV of given example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0047.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Marketing Automation Tools
+Description: Image depicts the head to head comparison of Pardot and Marketo
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0048.jpg }
+
+
+{ Topic:  Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Social Media Metrics- Follower Growth- Example- Scenario 2
+Description: This image shows calculation of follower’s growth of scenario 2
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0049.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Email Marketing Metrics- Open Rate- Formula
+Description: This image shows formula of Open Rate
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0050.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- PPC Metrics-  CTR (Click-Through Rate) -practical example
+Description: This image shows the calculation of CTR (Click-Through Rate) of the practical example
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0051.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing Channels- Social Media Marketing- The Role of Analytics in Social Media Marketing
+Description: image lists the Benefits of Social Media Analytics Tools
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0052.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Email Marketing Tools- Mailchimp- Key Features
+Description: Image lists down MailChimp features
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0053.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Email Marketing Metrics- Open Rate- example
+Description: This image shows calculation of Open Rate of example given
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0054.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing metrics and KPIs- Email Marketing Metrics- Unsubscribe Rate- formula
+Description: This image Displays the formula of unsubscribe rate 
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0055.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies- Social Media Tools- Canva- Key Features
+Description: This Image consists of canva’s key features pointers
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0056.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Social Media Metrics- Follower Growth- formula
+Description: This image shows formula of follower’s growth
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0057.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Understanding Bought, Owned, and Earned Media in Digital Marketing
+Description: this image is an overview of digital marketing media types i.e. earned, owned and paid media
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0058.jpg }
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing Channels- Email Marketing
+Description: image depicting types of emails which should be included in email marketing strategy
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0059.jpg }
+
+
+
+{ Topic:  Understanding the Digital Marketing Landscape- Digital Marketing Channels- Video Marketing- Measuring Video Marketing Success
+Description: Image shows steps of how to measure the success of video marketing strategies
+Link: https://storage.googleapis.com/digital_marketing_skillroom/IMG-20241215-WA0060.jpg }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Youtube videos
+
+{ Topic: Understanding the Digital Marketing Landscape
+Description: short introduction of what Digital Marketing is in short. A 5 minutes long video by Simplilearn
+Link: https://youtu.be/bixR-KIJKYM?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape
+Description: A detailed introduction to digital marketing by Simplilearn
+Link: https://youtu.be/ZVuHLPl69mM?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- SEO and SEM - SEO (Search Engine Optimization)
+Description: 5 minutes long explanation of what SEO is and how it works. Video by Simplilearn
+Link: https://youtu.be/MYE6T_gd7H0?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- SEO and SEM - SEO (Search Engine Optimization)
+Description: descriptive video, an introduction to SEO and how it works in detail. Video by LYFE Marketing
+Link: https://youtu.be/7lZc_fsw-JU?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- SEO and SEM - SEM (Search Engine Marketing)
+Description:An introductory video on SEM (Search Engine Marketing) made by Surfside PPC
+Link: https://youtu.be/CEpcMPyjX4s?feature=shared  }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- SEO and SEM - Difference between SEO and SEM
+Description: Difference between SEO and SEM. Video made by WebFX
+Link: https://youtu.be/6jOdC8vCA_g?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- PPC (Pay-Per-Click Advertising)
+Description: PPC tutorial for beginners. Introduction to PPC. Video by Simplilearn
+Link: https://youtu.be/5q341mozB-s?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing- Key Strategies in Social Media Marketing- Organic Social Media Posts
+Description: a video explaining Organic Social Media Marketing
+Link: https://youtu.be/_YREiTvnYQk?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing- Key Strategies in Social Media Marketing- Influencer Partnerships
+Description: a video dedicated to talking about Digital Marketing and Influencer Partnerships by Marketing Stuff, Maurice Davis MBA
+Link: https://youtu.be/NFUEBWO645o?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing- Key Strategies in Social Media Marketing- Paid Social Ads
+Description: a video dedicated to explaining how to master paid social media advertising. Video by HubSpot Marketing
+Link: https://youtu.be/ol0v779BlAA?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Social Media Marketing- The Role of Analytics in Social Media Marketing
+Description: Video talking about social media analytics, made by The Career Force
+Link: https://youtu.be/Z1KJ-16Rfs0?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing
+Description: Video dedicated to talking about how to get started with Email Marketing, by Silicon Valley Girl
+Link: https://youtu.be/OrbhGa4aeAM?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Key Email Marketing Tactics- Newsletters
+Description: tutorial video on how create a newsletter easily, by Brevo
+Link: https://youtu.be/Orv17jAUL-Y?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Key Email Marketing Tactics- Drip Campaigns
+Description: video talking about how to create effective drip campaigns, by SendPulse
+Link: https://youtu.be/-vRQnP8wj3E?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Key Email Marketing Tactics- Drip Campaigns
+Description:video explaining how to create an email sequence inside HubSpot, by Thalita Milan- Marketing Tips
+Link: https://youtu.be/aWFmIbNGglY?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Additional Email Types to Consider- Re-Engagement Emails
+Description: video about how to create re-engagement email campaign- how to bring back inactive subscribers, by Sarah Cordiner
+Link: https://www.youtube.com/live/Q132TDA0w4c?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Email Marketing- Why Email Marketing is Effective
+Description: in this video, you'll learn how to craft subject lines, create engaging content, and segment your email lists to target specific groups of members. We'll also explore the best practices for email design and layout, as well as tips for analyzing and improving your email campaign performance, by Member 365
+Link: https://youtu.be/J3kVb3FU-Pk?feature=shared }
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Content Marketing
+Description: this video talks about how to make the ultimate content marketing strategy, by Brian Dean
+Link: https://youtu.be/b5-GZwJgdrY?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Affiliate Marketing- How Affiliate Marketing Works
+Description: this video is a tutorial on affiliate marketing for beginners, by Santrel Media
+Link: https://youtu.be/ZjhZ7vCl3HQ?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Affiliate Marketing- Key Channels and Examples in Affiliate Marketing
+Description: video depicting 6 real-life examples of affiliate marketing, by Ivan Mana
+Link: https://youtu.be/gu2ocSSRexQ?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Affiliate Marketing- Affiliate Marketing Best Practices
+Description: this video talks about a few example websites to learn proper and effective affiliate marketing
+Link: https://youtu.be/u4v56IRAxOU?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Influencer Marketing
+Description: this video talks about what influencer marketing is in a simple manner for beginners, by Surfside PPC
+Link: https://youtu.be/807cWb8AwLY?feature=shared }
+
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Influencer Marketing- Examples of Effective Influencer Marketing
+Description: this video gives 8 examples of influencer marketing campaigns, by Influencity- Influencer Marketing
+Link: https://youtu.be/1CPYwEXj2UE?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Influencer Marketing
+Description: this video talks about influencer marketing strategy. Talks about what we should do to grow our business, by HubSpot Marketing
+Link: https://youtu.be/TvgfzI7rFYU?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Mobile Marketing- Key Strategies in Mobile Marketing- In-App Ads
+Description: this video talks about how one can advertise on a specific app using google ads, by Scott Redgate
+Link: https://youtu.be/oH8GcwN5kzc?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Mobile Marketing- Key Strategies in Mobile Marketing- Push Notifications
+Description: this video talks about the do’s and don’ts of push notification marketing, by Pulsate HQ
+Link: https://youtu.be/ulLcUX01HRA?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Mobile Marketing- Key Strategies in Mobile Marketing- QR Codes
+Description: this video talks about QR Code Marketing, by AppsFlyer
+Link: https://youtu.be/LKEL01Y_Ys8?feature=shared }
+
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Mobile Marketing- Key Strategies in Mobile Marketing- Location-Based Mobile Marketing
+Description: this video talks about location- based mobile marketing, by Sekel Tech
+Link: https://youtu.be/trOb3dTBBFA?feature=shared }
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Video Marketing
+Description: this video claims to be the ultimate guide to video marketing, by Visme
+Link: https://youtu.be/cjDdDbAUD5U?feature=shared }
+
+
+
+{ Topic:  Understanding the Digital Marketing Landscape- Digital Marketing Channels- Video Marketing
+Description: this video discusses the 11 types of marketing videos which are a must try, by Superside
+Link: https://youtu.be/iY-mxE3VAV0?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Video Marketing- Key Types of Video Marketing Content examples
+Description: this video talks about 5 types of video content marketing tips, by DefinedBy Alex
+Link: https://youtu.be/kvyD2UPt2Hw?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Programmatic Advertising
+Description: this video is about programmatic advertising, by AppsFlyer
+Link: https://youtu.be/2WHdPMp8wzQ?feature=shared }
+
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Programmatic Advertising- How Programmatic Advertising Works
+Description: this video discusses 40 programmatic ads basic concepts, by Senator We Run Ads
+Link: https://youtu.be/jgfZ2Oy4DyY?feature=shared  }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing Channels- Programmatic Advertising- Example Scenarios for Programmatic Advertising
+Description: this video displays what programmatic ads can look like, by Programmatic Digest
+Link: https://youtu.be/dSbnB70OiJE?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - SEO Tools- Google Search Console
+Description: this videos gives an introduction of Google Search Console and basic training, by Google Search Central
+Link: https://youtu.be/ONr5Z7VhNFI?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - SEO Tools- SEMrush
+Description:this video gives a step-by-step tutorial for beginners for SEMRUSH, by Metics Media
+Link: https://youtu.be/q1lTuX0i-68?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - SEO Tools- Ahrefs
+Description: this video is a tutorial for using Ahrefs to improve SEO, by Ahrefs
+Link: https://youtu.be/x5hH_lt8Guw?feature=shared }
+
+
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - SEO Tools- Yoast SEO
+Description: This video provides a complete tutorial on how to use Yoast SEO, by Darrel Wilson
+Link: https://youtu.be/k99b0Q2lobU?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - PPC Tools
+Description: This video lists and talks about to 10 PPC Tools
+Link: https://youtu.be/Qo3ldEpBaAc?feature=shared  }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Social Media Tools- Hootsuite
+Description: Video talks about how to use Hootsuite in short
+Link: https://youtu.be/8CykOEPTow0?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Social Media Tools- Buffer
+Description: Video talks about how to use buffer
+Link: https://youtu.be/iIN4p7d5uvQ?feature=shared  }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Social Media Tools- Canva
+Description: Video is a beginner’s guide for using canva
+Link: https://youtu.be/iizK1buYKag?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Email Marketing Tools- Mailchimp
+Description: Video is a tutorial for mailchimp use for beginners
+Link: https://youtu.be/HUQ28NpKr3A?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Email Marketing Tools- Constant Contact
+Description: Video is a tutorial for using constant contact 
+Link: https://youtu.be/xLg3RQ_gD0s?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Email Marketing Tools- HubSpot
+Description: Video is a guide for using HubSpot
+Link: https://youtu.be/QnoU9T-SfGg?feature=shared }
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Analytics Tools- Google Analytics
+Description: Video is a guide for using google analytics
+Link: https://youtu.be/ppkugm2tbSI?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Analytics Tools-  Hotjar
+Description: Video is a tutorial for using HotJar
+Link: https://youtu.be/nJym8OIQCY8?feature=shared }
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Content Marketing Tools
+Description: Video talks about 7 essential content marketing tools for beginners
+Link: https://youtu.be/PCALEZuiYyA?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Content Marketing Tools- BuzzSumo
+Description: Video is a tutorial for buzzsumo
+Link: https://youtu.be/0U4ZLQy54tY?feature=shared  }
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Conversion Optimization Tools- Optimizely
+Description: Video is a guide for using Optimizely
+Link: https://youtu.be/3B0GUkQ7g-M?feature=shared }
+
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape- Digital Marketing tools and technologies - Conversion Optimization Tools- VWO
+Description: Video is a guide of how to use VWO for simple CRO tests
+Link: https://youtu.be/Jty_I8liPY4?feature=shared }
+
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs
+Description: Video talks about Digital marketing metrics and KPI’s
+Link: https://youtu.be/mPiWWnJsVGw?feature=shared }
+
+
+
+{ Topic: Understanding the Digital Marketing Landscape-Digital Marketing metrics and KPIs- Website Metrics- Traffic Sources
+Description: Video talks about website traffic insights
+Link: https://youtu.be/iNZm9gxalDY?feature=shared }
+
+
+  

@@ -362,6 +362,71 @@ export default function LearningPage() {
     const firstHeadingMatch = content.match(/^#+ .+$/m);
     return firstHeadingMatch ? content.substring(content.indexOf(firstHeadingMatch[0])) : content;
   };
+  const handleRemedialTopic = async (topic) => {
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail || !selectedSkill || !selectedModule || !selectedLesson) return;
+  
+    try {
+      // Get current modules
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('modules')
+        .eq('email', userEmail)
+        .single();
+  
+      if (profileError) throw profileError;
+  
+      // Update the modules by adding the remedial topic to the current lesson
+      const updatedModules = profileData.modules.map(skill => {
+        if ((skill.name || skill?.skill?.name) === selectedSkill) {
+          return {
+            ...skill,
+            modules: (skill.modules || skill?.skill?.modules || []).map(module => {
+              if (module.name === selectedModule.name) {
+                return {
+                  ...module,
+                  lessons: module.lessons.map(lesson => {
+                    if (lesson.name === selectedLesson.name) {
+                      // Insert the remedial topic after the current topic
+                      const updatedTopics = [...lesson.topics];
+                      updatedTopics.splice(currentTopicIndex + 1, 0, topic);
+                      return { ...lesson, topics: updatedTopics };
+                    }
+                    return lesson;
+                  })
+                };
+              }
+              return module;
+            })
+          };
+        }
+        return skill;
+      });
+  
+      // Update the database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ modules: updatedModules })
+        .eq('email', userEmail);
+  
+      if (updateError) throw updateError;
+  
+      // Update local state
+      setModuleData(updatedModules);
+      
+      // Update the selected lesson's topics in local state
+      if (selectedLesson) {
+        const updatedTopics = [...selectedLesson.topics];
+        updatedTopics.splice(currentTopicIndex + 1, 0, topic);
+        setSelectedLesson({
+          ...selectedLesson,
+          topics: updatedTopics
+        });
+      }
+    } catch (error) {
+      console.error('Error adding remedial topic:', error);
+    }
+  };
   useEffect(() => {
     if (selectedLesson && selectedLesson.topics[currentTopicIndex]) {
       generateTopicContent(selectedLesson.topics[currentTopicIndex]);
@@ -942,8 +1007,10 @@ export default function LearningPage() {
                 </div>
               ))}
             </div> */}
-<Chatbot topic={selectedLesson?.topics?.[currentTopicIndex] || ''} 
-  studyMaterial={currentTopicContent || ''}
+<Chatbot 
+  topic={selectedLesson?.name || selectedModule?.name || selectedSkill} 
+  studyMaterial={currentTopicContent}
+  onRemedialTopic={handleRemedialTopic}
 />
             {/* Message Input */}
             {/* <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
