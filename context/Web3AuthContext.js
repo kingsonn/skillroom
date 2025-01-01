@@ -12,7 +12,6 @@ import {
   import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
   import { Web3Auth } from "@web3auth/modal";
 import RPC from "../hooks/ethersRPC";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 
 const Web3AuthContext = createContext({
   web3auth: null,
@@ -91,13 +90,7 @@ const [tokenclaim, setTokenclaim]= useState(false)
           
         const web3auth = new Web3Auth(web3AuthOptions);
           setinitt(true);
-        const openloginAdapter = new OpenloginAdapter({
-          adapterSettings: {
-            network: "devnet",
-            uxMode: "popup",
-          },
-        });
-        web3auth.configureAdapter(openloginAdapter);
+     
 
         setWeb3auth(web3auth);
         await web3auth.initModal(); 
