@@ -12,6 +12,14 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    config.experiments = {
+      ...config.experiments,
+      topLevelAwait: true,
+      layers: true,
+    }
+    return config
+  }
 }
 
 module.exports = nextConfig
