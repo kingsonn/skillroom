@@ -10,7 +10,7 @@ import confetti from 'canvas-confetti';
 import Link from 'next/link';
 import { SignInModal } from '../components/SignInModal';
 import { WelcomePopup } from '../components/WelcomePopup';
-
+import { useWeb3Auth } from '../context/Web3AuthContext';
 const trendingSkills = [
   {
     id: 1,
@@ -104,7 +104,15 @@ export default function Home() {
   const [isGeneratingCourse, setIsGeneratingCourse] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
-
+  const { login, isLoading, user, getAccounts, sendTransaction, ownerAddCertificate, getCertificate, claimToken, balanceToken } = useWeb3Auth();
+  const handleAccount = async () => {
+    const accounts = await getAccounts();
+    console.log(accounts);
+    // await ownerAddCertificate(accounts,"Digital Marketing","mmmmm");
+    // await claimToken();
+    await getCertificate();
+    // await balanceToken();
+  };
   const milestones = [
     { days: 3, title: 'Star', icon: '⭐' },
     { days: 5, title: 'Superstar', icon: '🌟' },
@@ -119,8 +127,10 @@ export default function Home() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         // Fetch user data
+    console.log(session)
         if (session?.user?.email) {
-window.location.reload();        }
+// window.location.reload();        
+}
       }
     });
 
@@ -364,7 +374,9 @@ window.location.reload();        }
           </div>
         </div>
       )}
-
+<button onClick={handleAccount}>
+  get account
+</button>
       {/* Hero Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

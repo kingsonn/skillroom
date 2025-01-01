@@ -6,6 +6,8 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Layout from '../../components/Layout';
 import { Radar } from 'react-chartjs-2';
+import { useWeb3Auth } from '../../context/Web3AuthContext';
+
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -16,6 +18,7 @@ import {
   Legend
 } from 'chart.js';
 import { downloadCertificate } from '../../components/CertificateGenerator';
+import { Web3AuthProvider } from '../../components/Web3AuthProvider';
 
 ChartJS.register(
   RadialLinearScale,
@@ -52,6 +55,23 @@ export default function ProfilePage() {
   const [selectedQuest, setSelectedQuest] = useState(null);
   const controls = useAnimation();
   const characterRef = useRef(null);
+  const { login, isLoading, user,initt,provider,tokenclaim, web3auth, getAccounts, sendTransaction, ownerAddCertificate, getCertificate, claimToken, balanceToken } = useWeb3Auth();
+  const [certificate, setCertificate] = useState([]);
+  const [claiming, setClaiming] = useState(false);
+
+  const handleClaimToken = async () => {
+    if (claiming) return;
+    try {
+      setClaiming(true);
+      await claimToken();
+      // You might want to refresh the token balance in the header
+      // This will happen automatically due to the useEffect in Layout
+    } catch (error) {
+      console.error('Error claiming tokens:', error);
+    } finally {
+      setClaiming(false);
+    }
+  };
 
   // Enhanced user stats with RPG elements
   const userStats = {
@@ -172,6 +192,75 @@ export default function ProfilePage() {
     }
   };
 
+  const downloadCertificate = async (cert) => {
+    try {
+      // Create a canvas element
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 1200;
+      canvas.height = 800;
+
+      // Create a new image object
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+
+      // Wait for the image to load
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = '/certificate-template.png'; // Make sure this image exists in your public folder
+      });
+
+      // Draw the background
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Set up certificate text
+      ctx.fillStyle = '#1a1a1a';
+      ctx.textAlign = 'center';
+
+      // Draw user email
+      ctx.font = 'bold 50px Arial';
+      ctx.fillText(user?.email || 'Student', canvas.width / 2, 400);
+
+      // Draw completion text
+      ctx.font = '30px Arial';
+      ctx.fillText('has successfully completed the course', canvas.width / 2, 460);
+
+      // Draw course name
+      ctx.font = 'bold 40px Arial';
+      ctx.fillText(cert['0'], canvas.width / 2, 520);
+
+      // Draw date
+      ctx.font = '30px Arial';
+      const date = new Date(Number(cert['2'].toString()) * 1000);
+      ctx.fillText(`Issued on ${date.toLocaleDateString()}`, canvas.width / 2, 600);
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${cert['0']}_Certificate.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      console.error('Error generating certificate:', error);
+    }
+  };
+
+  useEffect(()=>{
+    if(user){
+      const fetchCertificate = async () => {
+        const cert = await getCertificate();
+        console.log(cert);
+        setCertificate(cert);
+      }
+
+      fetchCertificate();}
+  },[initt,provider])
   useEffect(() => {
     const email = localStorage.getItem('userEmail');
     if (email) {
@@ -250,7 +339,7 @@ export default function ProfilePage() {
                     <h1 className="text-2xl font-bold game-font text-gray-800 dark:text-gray-200">
                       {userEmail || 'Player One'}
                     </h1>
-                    <span className="px-3 py-1 bg-gradient-to-r from-emerald-400 to-cyan-400 text-white text-sm rounded-full font-medium">
+                    <span className="px-3 py-1 bg-gradient-to-r from-emerald-400 to-cyan-500 text-white text-sm rounded-full font-medium">
                       {userStats.class.name}
                     </span>
                   </div>
@@ -427,23 +516,44 @@ export default function ProfilePage() {
         {/* Certificates Section */}
         <div className="max-w-6xl mx-auto">
           <div className="game-card">
-            <h3 className="text-xl font-bold mb-8 flex items-center gap-2 text-gray-800 dark:text-gray-200 game-font">
-              <FaCertificate className="text-yellow-500" />
-              Achievement Collection
-            </h3>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-gray-200 game-font">
+                <FaCertificate className="text-yellow-500" />
+                Achievement Collection
+              </h3>
+              <button
+                onClick={handleClaimToken}
+                disabled={claiming}
+                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white 
+                  ${claiming ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'} 
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}
+              >
+                {claiming ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Claiming...
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">✨</span>
+                    Claim Learning Points
+                  </>
+                )}
+              </button>
+            </div>
             <div className="grid grid-cols-3 gap-8">
-              {userStats.certificates.map((cert) => (
+              {certificate && certificate.map((cert, index) => (
                 <motion.div
-                  key={cert.id}
+                  key={index}
                   className="group relative cursor-pointer"
                   whileHover={{ 
                     scale: 1.03,
                     transition: { duration: 0.2 }
                   }}
-                  onClick={() => {
-                    console.log('Certificate card clicked', { cert, userEmail });
-                    downloadCertificate(cert, userEmail);
-                  }}
+                  onClick={() => downloadCertificate(cert)}
                 >
                   {/* Card Container */}
                   <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl overflow-hidden shadow-xl h-[450px] border border-gray-200 dark:border-gray-700">
@@ -451,7 +561,7 @@ export default function ProfilePage() {
                     <div className="absolute inset-0 opacity-30">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent opacity-10 animate-shimmer" />
                       <div className="absolute inset-0" style={{
-                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
                         backgroundSize: '30px 30px'
                       }} />
                     </div>
@@ -461,70 +571,38 @@ export default function ProfilePage() {
                       {/* Top Section */}
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${cert.badgeColor} text-white shadow-lg`}>
-                            {cert.rarity}
-                          </span>
-                          <span className="text-gray-500 dark:text-gray-400 text-xs font-mono">
-                            {cert.tokenId}
+                          <span className="px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-lg">
+                            Certificate
                           </span>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                          {new Date(cert.issueDate).toLocaleDateString()}
+                          {new Date(Number(cert['2'].toString()) * 1000).toLocaleDateString()}
                         </div>
                       </div>
 
                       {/* Certificate Icon - Fixed Height */}
                       <div className="flex-grow flex items-center justify-center py-8">
                         <div className="relative">
-                          <div className={`absolute inset-0 bg-gradient-to-br ${cert.badgeColor} rounded-xl opacity-20 blur-xl animate-pulse`} />
-                          <div className="relative w-64 h-40">
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <img 
-                                src="/certificate-template.png" 
-                                alt="Certificate"
-                                className="w-full h-full object-contain p-2"
-                              />
-                            </div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl opacity-20 blur-xl animate-pulse" />
+                          <div className="relative w-64 h-40 flex items-center justify-center">
+                            <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-200">
+                              {cert['0']}
+                            </h3>
                           </div>
                         </div>
                       </div>
 
-                      {/* Certificate Details - Fixed Height */}
-                      <div className="h-[140px] flex flex-col">
-                        <h4 className="text-xl font-bold text-gray-800 dark:text-white mb-4 game-font text-center leading-relaxed">
-                          {cert.name}
-                        </h4>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          {cert.skills.map((skill, idx) => (
-                            <span 
-                              key={idx}
-                              className={`px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r ${cert.badgeColor} bg-opacity-20 text-gray-700 dark:text-white border border-gray-300 dark:border-gray-700`}
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                        
-                        {/* Download Indicator */}
-                        <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-                          <FaDownload className="text-sm" />
-                          Click to download
+                      {/* Bottom Section */}
+                      <div className="mt-auto">
+                        <div className="text-center text-gray-600 dark:text-gray-400">
+                          <p className="text-sm flex items-center justify-center gap-2">
+                            <FaDownload className="text-sm" />
+                            Click to download certificate
+                          </p>
                         </div>
                       </div>
-
-                      {/* Bottom Border */}
-                      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${cert.badgeColor}`} />
-                    </div>
-
-                    {/* Hover Effects */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent opacity-10 animate-shine" />
                     </div>
                   </div>
-
-                  {/* Glow Effect */}
-                  <div className={`absolute -inset-1 bg-gradient-to-r ${cert.badgeColor} opacity-0 group-hover:opacity-30 blur-lg transition-opacity duration-300`} />
                 </motion.div>
               ))}
             </div>

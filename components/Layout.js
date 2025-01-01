@@ -5,22 +5,43 @@ import { createClient } from '../utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { FiMenu } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
-import { SignInModal } from './SignInModal';
 import { WelcomePopup } from './WelcomePopup';
 import { signout } from '../lib/auth-actions';
 import Sidebar from './Sidebar';
+import { useWeb3Auth } from '../context/Web3AuthContext';
+import { type } from 'os';
 
 export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+  const { login, logout,initt, user: web3AuthUser, web3auth,tokenclaim, provider, balanceToken } = useWeb3Auth();
+  const [tokenBalance, setTokenBalance] = useState("0");
 
   useEffect(() => {
-    // Set initial email from localStorage
+    handleWeb3Login();
+    
+  }, [provider]);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (web3AuthUser) {
+        try {
+          const balance = await balanceToken();
+          setTokenBalance(balance.toString());
+          console.log(typeof balance);
+        } catch (error) {
+          console.error('Error fetching token balance:', error);
+        }
+      }
+    };
+    fetchBalance();
+  }, [initt, provider, tokenclaim]);
+
+  useEffect(() => {
     const storedEmail = localStorage.getItem('userEmail');
     if (storedEmail) {
       setUserEmail(storedEmail);
@@ -35,15 +56,9 @@ export default function Layout({ children }) {
             localStorage.setItem('hasLoggedInBefore', 'true');
             setShowWelcomePopup(true);
           }
-          // const isNew = await checkNew(session.user.email);
-          // if (isNew) {
-          //   setShowWelcomePopup(true);
-          // }
           localStorage.setItem('userEmail', session.user.email);
           setUserEmail(session.user.email);
-          // Ensure user profile exists
           await ensureUserProfile(session.user.email);
-         
         } else {
           const savedEmail = localStorage.getItem('userEmail');
           if (savedEmail) {
@@ -68,9 +83,7 @@ export default function Layout({ children }) {
         }
         localStorage.setItem('userEmail', session.user.email);
         setUserEmail(session.user.email);
-     
       } else if (event === 'SIGNED_OUT') {
-        // Don't remove email from localStorage on sign out
         setUserEmail(localStorage.getItem('userEmail'));
       }
     });
@@ -80,29 +93,50 @@ export default function Layout({ children }) {
     };
   }, []);
 
+  const handleWeb3Login = async () => {
+    try {
+      await login();
+      const userInfo = await web3auth.getUserInfo();
+      if (userInfo?.email) {
+        localStorage.setItem('userEmail', userInfo.email);
+        setUserEmail(userInfo.email);
+        await ensureUserProfile(userInfo.email);
+      }
+    } catch (error) {
+      console.error('Web3Auth login error:', error);
+    }
+  };
+
+  const handleWeb3Logout = async () => {
+    try {
+      await logout();
+      await supabase.auth.signOut();
+      localStorage.removeItem('userEmail'); 
+      setUserEmail(null);
+      localStorage.setItem('userReload', 'false');
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleSignOut = async () => {
     try {
-      const { error } = await signout();
-      if (error) {
-        console.error('Sign out error:', error);
-        return;
-      }
-      // Keep the email in localStorage but update the state
-      setUserEmail(localStorage.getItem('userEmail'));
+      await signout();
       router.push('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Error signing out:', error);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -130,25 +164,43 @@ export default function Layout({ children }) {
           
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            {userEmail ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {userEmail}
-                </span>
-                <button
-                  onClick={handleSignOut}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsSignInModalOpen(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              >
-                Sign In
-              </button>
+            {!isLoading && (
+              <>
+                {web3AuthUser ? (
+                  <div className="flex items-center space-x-4">
+                    {tokenBalance !== null && (
+                      <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 rounded-full">
+                        <span className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+                          ✨ {tokenBalance} Learning Points
+                        </span>
+                      </div>
+                    )}
+                    {web3AuthUser.profileImage && (
+                      <img 
+                        src={web3AuthUser.profileImage} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {web3AuthUser.name || web3AuthUser.email}
+                    </span>
+                    <button
+                      onClick={handleWeb3Logout}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleWeb3Login}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  >
+                    Connect Wallet
+                  </button>
+                )}
+              </>
             )}
           </div>
         </header>
@@ -156,17 +208,12 @@ export default function Layout({ children }) {
         <main className="p-4 md:p-8 mt-16">
           {children}
         </main>
+
+        <WelcomePopup
+          isOpen={showWelcomePopup}
+          onClose={() => setShowWelcomePopup(false)}
+        />
       </div>
-
-      <SignInModal 
-        isOpen={isSignInModalOpen} 
-        onClose={() => setIsSignInModalOpen(false)} 
-      />
-
-      <WelcomePopup
-        isOpen={showWelcomePopup}
-        onClose={() => setShowWelcomePopup(false)}
-      />
     </div>
   );
 }

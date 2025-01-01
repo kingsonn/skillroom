@@ -8,6 +8,8 @@ import { marked } from 'marked';
 import Chatbot from "../../components/Chatbot";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useWeb3Auth } from '../../context/Web3AuthContext';
+
 export default function LearningPage() {
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you with your learning journey?", isBot: true },
@@ -29,9 +31,13 @@ export default function LearningPage() {
   const [loadingContent, setLoadingContent] = useState(false);
   const [markdownError, setMarkdownError] = useState(null);
   const supabase = createClientComponentClient();
+  const { login, isLoading, user, getAccounts, sendTransaction, ownerAddCertificate, getCertificate, claimToken, balanceToken } = useWeb3Auth();
 
   const [completionModal, setCompletionModal] = useState({ show: false, currentLesson: null, nextLesson: null });
-
+  useEffect(() => {
+    const a = calculateTotalLessonsAndProgress();
+    console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
+}, [userProgress]); // This will run whenever userProgress changes
   useEffect(() => {
     async function fetchUserSkills() {
       try {
@@ -180,6 +186,42 @@ export default function LearningPage() {
     
     return Math.round((completedLessons / totalLessons) * 100);
   };
+  const calculateTotalLessonsAndProgress = () => {
+    if (!userProgress || !selectedSkill) return { totalLessons: 0, completedLessons: 0 };
+
+    const skill = moduleData?.find(skill => 
+        skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
+    );
+
+    if (!skill) return { totalLessons: 0, completedLessons: 0 };
+
+    let totalLessons = 0;
+    let completedLessons = 0;
+
+    skill.modules.forEach(module => {
+        totalLessons += module.lessons.length;
+        completedLessons += module.lessons.filter(lesson => {
+            const progressKey = `${selectedSkill}.${module.name}.${lesson.name}`;
+            return userProgress[progressKey]?.status === 'completed';
+        }).length;
+    });
+    const storedTopics = JSON.parse(localStorage.getItem("completedCourses")) || [];
+    // Check if the topic is already in the array
+    if (!storedTopics.includes(selectedSkill)) {
+      if (totalLessons > 0 && totalLessons === completedLessons) {
+        console.log("course completed");
+        storedTopics.push(selectedSkill);
+        localStorage.setItem("completedCourses", JSON.stringify(storedTopics));
+        ownerAddCertificate(getAccounts(),selectedSkill, "template");
+      }
+      return {totalLessons, completedLessons}; // Exit the function without adding the duplicate
+    }else{
+
+      console.log(`Topic  is already in the list.`);
+    }
+    
+    return { totalLessons, completedLessons };
+};
 
   const getNextLesson = (currentModule, currentLesson) => {
     const currentLessonIndex = currentModule.lessons.findIndex(l => l.name === currentLesson.name);
@@ -210,7 +252,7 @@ export default function LearningPage() {
       if (error) throw error;
       
       setUserProgress(newProgress);
-      
+      console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
       // Check for next lesson
       const nextLesson = getNextLesson(selectedModule, lesson);
       if (nextLesson) {
