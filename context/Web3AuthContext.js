@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import {
     AccountAbstractionProvider,
-    BiconomySmartAccount,
+    SafeSmartAccount,
   } from "@web3auth/account-abstraction-provider";
   import {
     CHAIN_NAMESPACES,
@@ -67,7 +67,7 @@ const [tokenclaim, setTokenclaim]= useState(false)
                 // Get the pimlico API Key from dashboard.pimlico.io
                 url: `https://api.pimlico.io/v2/97/rpc?apikey=pim_nXWicVjUDNS4AWuBioN32f`,
               },
-              smartAccountInit: new BiconomySmartAccount(),
+              smartAccountInit: new SafeSmartAccount(),
               paymasterConfig: {
                 // Get the pimlico API Key from dashboard.pimlico.io
                 url: `https://api.pimlico.io/v2/97/rpc?apikey=pim_nXWicVjUDNS4AWuBioN32f`,
