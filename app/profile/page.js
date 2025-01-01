@@ -30,27 +30,27 @@ ChartJS.register(
 );
 
 const CHARACTER_CLASSES = {
-  WARRIOR: {
-    name: 'Code Warrior',
-    icon: '⚔️',
-    stats: { strength: 80, agility: 60, intellect: 40 }
+  INNOVATOR: {
+    name: 'Tech Innovator',
+    icon: '💡',
+    stats: { creativity: 80, technical: 60, leadership: 40 }
   },
-  MAGE: {
-    name: 'Tech Mage',
-    icon: '🔮',
-    stats: { strength: 30, agility: 50, intellect: 90 }
+  ARCHITECT: {
+    name: 'Solution Architect',
+    icon: '🏗️',
+    stats: { technical: 80, planning: 70, leadership: 50 }
   },
-  ROGUE: {
-    name: 'Data Rogue',
-    icon: '🗡️',
-    stats: { strength: 50, agility: 85, intellect: 45 }
+  SPECIALIST: {
+    name: 'Tech Specialist',
+    icon: '⚡',
+    stats: { technical: 85, creativity: 45, planning: 70 }
   }
 };
 
 export default function ProfilePage() {
   const [userEmail, setUserEmail] = useState('');
   const [showLevelUpAnimation, setShowLevelUpAnimation] = useState(false);
-  const [selectedCharacterClass, setSelectedCharacterClass] = useState('WARRIOR');
+  const [selectedCharacterClass, setSelectedCharacterClass] = useState('INNOVATOR');
   const [showInventory, setShowInventory] = useState(false);
   const [selectedQuest, setSelectedQuest] = useState(null);
   const controls = useAnimation();
@@ -76,29 +76,27 @@ export default function ProfilePage() {
   // Enhanced user stats with RPG elements
   const userStats = {
     level: 12,
-    experience: 1250,
-    nextLevelExp: 1500,
-    health: 100,
-    mana: 80,
-    stamina: 90,
+    proficiency: 100,
+    focus: 80,
+    energy: 90,
     class: CHARACTER_CLASSES[selectedCharacterClass],
     attributes: {
-      strength: 15,
-      agility: 12,
-      intellect: 18,
-      wisdom: 14,
-      charisma: 10
+      technical: 15,
+      creativity: 12,
+      planning: 18,
+      communication: 14,
+      leadership: 10
     },
     skills: {
-      coding: 75,
-      debugging: 60,
-      architecture: 45,
+      problemSolving: 75,
+      systemDesign: 60,
+      dataStructures: 45,
       algorithms: 80,
       teamwork: 65,
-      problemSolving: 70
+      projectManagement: 70
     },
     inventory: [
-      { id: 1, name: 'Debug Potion', icon: '🧪', quantity: 3, rarity: 'rare' },
+      { id: 1, name: 'Focus Boost', icon: '🎯', quantity: 3, rarity: 'rare' },
       { id: 2, name: 'Code Scroll', icon: '📜', quantity: 5, rarity: 'common' },
       { id: 3, name: 'Golden Keyboard', icon: '⌨️', quantity: 1, rarity: 'legendary' }
     ],
@@ -284,8 +282,8 @@ export default function ProfilePage() {
   }, []);
 
   const calculateProgress = () => {
-    const current = userStats.experience - 1000;
-    const total = userStats.nextLevelExp - 1000;
+    const current = userStats.proficiency;
+    const total = 100;
     return (current / total) * 100;
   };
 
@@ -302,104 +300,97 @@ export default function ProfilePage() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900">
-        {/* Top Banner */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2H6zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-                backgroundSize: '30px 30px'
-              }} />
+        {/* Profile Header */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white text-xl font-bold">
+                {userStats.level}
+              </div>
+              <div className="absolute -bottom-1 -right-1 bg-yellow-400 rounded-full p-1">
+                <FaCrown className="text-white" />
+              </div>
             </div>
-            
-            <div className="relative p-8">
-              <div className="flex items-center gap-8">
-                {/* Character Display */}
-                <div className="relative">
-                  <motion.div 
-                    className="w-32 h-32 relative"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full opacity-20 animate-pulse" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-4 border-emerald-400">
-                      <span className="text-5xl">{userStats.class.icon}</span>
-                    </div>
-                    {/* Level Badge */}
-                    <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-white shadow-lg">
-                      {userStats.level}
-                    </div>
-                  </motion.div>
-                </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{userEmail || 'Skilled Developer'}</h2>
+              <p className="text-gray-600 dark:text-gray-300">{CHARACTER_CLASSES[selectedCharacterClass].name}</p>
+            </div>
+          </div>
+        </div>
 
-                {/* User Info */}
-                <div className="flex-grow">
-                  <div className="flex items-center gap-4 mb-4">
-                    <h1 className="text-2xl font-bold game-font text-gray-800 dark:text-gray-200">
-                      {userEmail || 'Player One'}
-                    </h1>
-                    <span className="px-3 py-1 bg-gradient-to-r from-emerald-400 to-cyan-500 text-white text-sm rounded-full font-medium">
-                      {userStats.class.name}
-                    </span>
+        {/* Achievement Grid */}
+        <div className="max-w-6xl mx-auto grid grid-cols-3 gap-6 mb-8">
+          <div className="relative overflow-hidden rounded-xl shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-indigo-600 opacity-90"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                    <FaTrophy className="text-yellow-300 text-2xl" />
                   </div>
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-4 gap-6">
-                    <div className="stat-card">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FaHeart className="text-red-500" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">HP</span>
-                      </div>
-                      <div className="stat-bar">
-                        <motion.div
-                          className="stat-bar-fill bg-red-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${userStats.health}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FaBolt className="text-blue-500" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">MP</span>
-                      </div>
-                      <div className="stat-bar">
-                        <motion.div
-                          className="stat-bar-fill bg-blue-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${userStats.mana}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FaShieldAlt className="text-yellow-500" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">DEF</span>
-                      </div>
-                      <div className="stat-bar">
-                        <motion.div
-                          className="stat-bar-fill bg-yellow-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${userStats.stamina}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FaStar className="text-purple-500" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">EXP</span>
-                      </div>
-                      <div className="stat-bar">
-                        <motion.div
-                          className="stat-bar-fill bg-purple-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${calculateProgress()}%` }}
-                        />
-                      </div>
-                    </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Top 1%</h3>
+                    <p className="text-sm text-white/80">Among Learners</p>
                   </div>
                 </div>
+                <div className="text-3xl font-bold text-white">{userStats.proficiency}%</div>
+              </div>
+              <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-white/40 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${userStats.proficiency}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-xl shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-600 opacity-90"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                    <FaBolt className="text-yellow-300 text-2xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Fast Track</h3>
+                    <p className="text-sm text-white/80">Learning Speed</p>
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-white">{userStats.focus}%</div>
+              </div>
+              <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-white/40 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${userStats.focus}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-xl shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-600 opacity-90"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                    <FaFire className="text-yellow-300 text-2xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Streak Master</h3>
+                    <p className="text-sm text-white/80">30 Day Streak</p>
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-white">{userStats.energy}%</div>
+              </div>
+              <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-white/40 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${userStats.energy}%` }}
+                />
               </div>
             </div>
           </div>
@@ -517,31 +508,38 @@ export default function ProfilePage() {
         <div className="max-w-6xl mx-auto">
           <div className="game-card">
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-gray-200 game-font">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-gray-200">
                 <FaCertificate className="text-yellow-500" />
                 Achievement Collection
               </h3>
               <button
                 onClick={handleClaimToken}
                 disabled={claiming}
-                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white 
-                  ${claiming ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'} 
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors`}
+                className={`relative group overflow-hidden px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-lg
+                  hover:shadow-xl transform hover:scale-105 transition-all duration-200
+                  ${claiming ? 'opacity-75 cursor-not-allowed' : 'hover:from-indigo-500 hover:to-purple-500'}`}
               >
-                {claiming ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Claiming...
-                  </>
-                ) : (
-                  <>
-                    <span className="mr-2">✨</span>
-                    Claim Learning Points
-                  </>
-                )}
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
+                <div className="absolute -inset-full group-hover:inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
+                  skew-x-12 group-hover:animate-[shine_1.5s_ease-in-out_infinite] transition-all duration-500"></div>
+                <div className="relative flex items-center gap-2">
+                  {claiming ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Claiming...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-2xl">✨</span>
+                      <span>Claim Learning Points</span>
+                      <span className="text-2xl">🏆</span>
+                    </>
+                  )}
+                </div>
+                <div className="absolute inset-0 border-2 border-white/20 rounded-xl"></div>
               </button>
             </div>
             <div className="grid grid-cols-3 gap-8">
@@ -561,7 +559,7 @@ export default function ProfilePage() {
                     <div className="absolute inset-0 opacity-30">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black dark:via-white to-transparent opacity-10 animate-shimmer" />
                       <div className="absolute inset-0" style={{
-                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                        backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2H6zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
                         backgroundSize: '30px 30px'
                       }} />
                     </div>

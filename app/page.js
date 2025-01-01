@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { SignInModal } from '../components/SignInModal';
 import { WelcomePopup } from '../components/WelcomePopup';
 import { useWeb3Auth } from '../context/Web3AuthContext';
+
 const trendingSkills = [
   {
     id: 1,
@@ -256,10 +257,10 @@ export default function Home() {
 
     fetchUserData();
   }, []);
+
   useEffect(() => {
     setHasUserEmail(!!localStorage.getItem('userEmail'));
   }, []);
- 
 
   const currentLevel = userData?.level || 1;
   const xpPoints = userData?.current_xp || 0;
@@ -713,7 +714,7 @@ export default function Home() {
                   {dailyChallenges.map((challenge) => (
                     <div 
                       key={challenge.id} 
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                     >
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
@@ -738,7 +739,7 @@ export default function Home() {
                   {topLearners.map((learner) => (
                     <div 
                       key={learner.id} 
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
                     >
                       <div className="flex items-center">
                         <span className="text-2xl mr-3">{learner.badge}</span>
@@ -758,47 +759,56 @@ export default function Home() {
           {/* Right Sidebar */}
           <div className="col-span-4 space-y-4">
             {/* Streak Display */}
-            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-6 shadow-lg transform hover:scale-102 transition-all duration-300 border border-purple-400/20">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="relative w-14 h-14 flex items-center justify-center bg-purple-700/30 rounded-xl">
-                      <FaFire className="text-3xl text-yellow-400 animate-pulse" />
-                      {streakData.currentStreak >= 7 && (
-                        <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-1">
-                          <FaCrown className="text-sm text-purple-900" />
-                        </div>
-                      )}
+            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-8 shadow-lg transform hover:scale-102 transition-all duration-300 border border-purple-400/20">
+              {/* Header Section */}
+              <div className="flex items-center gap-6 mb-8">
+                <div className="relative">
+                  <div className="relative w-16 h-16 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-2xl shadow-inner">
+                    <FaFire className="text-4xl text-yellow-400 animate-pulse" />
+                    <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-1.5 shadow-lg">
+                      <FaCrown className="text-sm text-purple-900" />
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">
-                      {streakData.currentStreak}-day streak
-                    </h3>
-                    <p className="text-purple-200 text-sm font-medium">
-                      Your story will echo!
-                    </p>
-                  </div>
                 </div>
-                <div className="flex flex-col items-end">
-                  <div className="text-white text-lg font-bold">{streakData.longestStreak}</div>
-                  <div className="text-purple-200 text-sm">Max streak</div>
+                <div>
+                  <h3 className="text-3xl font-bold text-white mb-2">
+                    1-day streak
+                  </h3>
+                  <p className="text-purple-200 text-base">
+                    Keep going, champion! 🌟
+                  </p>
                 </div>
               </div>
 
               {/* Days of Week */}
-              <div className="bg-purple-900/30 rounded-xl p-4 mb-6">
-                <div className="grid grid-cols-7 gap-3">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8">
+                <div className="grid grid-cols-7 gap-1">
                   {daysOfWeek.map((day, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-purple-200 text-sm mb-2">{day}</div>
+                    <div 
+                      key={day}
+                      className="flex flex-col items-center"
+                    >
                       <div 
-                        className={`aspect-square rounded-full flex items-center justify-center
-                          ${index === 0 
-                            ? 'bg-yellow-400 text-purple-900' 
-                            : 'bg-purple-800/30 text-purple-300'}`}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 mb-1 ${
+                          index === 2 
+                            ? 'bg-yellow-400 shadow-lg ring-2 ring-yellow-400/30' 
+                            : 'bg-white/10 hover:bg-white/20'
+                        }`}
                       >
-                        {index === 0 && <FaCheck className="text-sm" />}
+                        {index === 2 ? (
+                          <FaCheck className="text-purple-900 text-sm" />
+                        ) : (
+                          <span className={`text-xs font-medium ${
+                            index === 2 ? 'text-purple-900' : 'text-purple-200'
+                          }`}>
+                            {day}
+                          </span>
+                        )}
+                      </div>
+                      <div className={`text-[9px] font-medium ${
+                        index === 2 ? 'text-yellow-400' : 'text-purple-200/70'
+                      }`}>
+                        {day}
                       </div>
                     </div>
                   ))}
@@ -806,35 +816,46 @@ export default function Home() {
               </div>
 
               {/* Milestone Badges */}
-              <div className="grid grid-cols-4 gap-2">
-                {milestones.map((milestone, index) => (
-                  <div 
-                    key={index} 
-                    className={`text-center p-2 rounded-xl ${
-                      streakData.currentStreak >= milestone.days
-                        ? 'bg-yellow-400/20'
-                        : 'bg-purple-900/30'
-                    }`}
-                  >
-                    <div className={`text-2xl mb-1 ${
-                      streakData.currentStreak >= milestone.days
-                        ? 'opacity-100'
-                        : 'opacity-40'
-                    }`}>
-                      {milestone.icon}
+              <div className="overflow-x-auto pb-4 -mx-8 px-8">
+                <div className="flex gap-4 min-w-max">
+                  {milestones.map((milestone, index) => (
+                    <div 
+                      key={index} 
+                      className={`relative group overflow-hidden ${
+                        index === 0
+                          ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
+                          : 'bg-white/10 hover:bg-white/20'
+                      } rounded-xl p-4 transition-all duration-300 flex flex-col items-center justify-center w-[160px] h-[120px]`}
+                    >
+                      {/* Shine Effect */}
+                      <div 
+                        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${
+                          index === 0 
+                            ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent -rotate-45 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000' 
+                            : ''
+                        }`} 
+                      />
+                      
+                      <div className="relative text-center">
+                        <div className={`text-3xl mb-2 ${
+                          index === 0 ? '' : 'opacity-40'
+                        }`}>
+                          {milestone.icon}
+                        </div>
+                        <div className={`text-sm font-bold mb-1 ${
+                          index === 0 ? 'text-purple-900' : 'text-white'
+                        }`}>
+                          {milestone.days} days
+                        </div>
+                        <div className={`text-xs ${
+                          index === 0 ? 'text-purple-900/70' : 'text-purple-200/70'
+                        }`}>
+                          {milestone.title}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm font-medium text-white">
-                      {milestone.days} days
-                    </div>
-                    <div className={`text-xs ${
-                      streakData.currentStreak >= milestone.days
-                        ? 'text-yellow-400'
-                        : 'text-purple-300'
-                    }`}>
-                      {milestone.title}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
 
