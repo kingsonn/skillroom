@@ -10,7 +10,7 @@ import { signout } from '../lib/auth-actions';
 import Sidebar from './Sidebar';
 import { useWeb3Auth } from '../context/Web3AuthContext';
 import { type } from 'os';
-
+import { checkProfileExists } from '../lib/auth-actions';
 export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
@@ -101,7 +101,7 @@ export default function Layout({ children }) {
       if (userInfo?.email) {
         localStorage.setItem('userEmail', userInfo.email);
         setUserEmail(userInfo.email);
-        await ensureUserProfile(userInfo.email);
+        await checkProfileExists(userInfo.email, userInfo.name);
       }
     } catch (error) {
       console.error('Web3Auth login error:', error);
