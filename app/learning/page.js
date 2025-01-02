@@ -352,7 +352,7 @@ export default function LearningPage() {
       });
 
       const data = await response.json();
-
+console.log("this is data", data, 'this is response',response)
       if (!response.ok) {
         throw new Error(data.error || `Server error: ${response.status}`);
       }
