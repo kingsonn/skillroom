@@ -338,7 +338,7 @@ export default function LearningPage() {
         lesson: selectedLesson?.name
       });
 
-      const response = await fetch(`/api/langflow/${selectedSkill==="Digital Marketing"?"digital":"generate"}`, {
+      const response = await fetch(`/api/langflow/${selectedSkill=="Digital Marketing"?"digital":"generate"}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
