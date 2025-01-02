@@ -259,6 +259,36 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const checkFirstTimeUser = async () => {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) {
+        setHasUserEmail(false);
+        return;
+      }
+
+      setHasUserEmail(true);
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('first_time')
+          .eq('email', userEmail)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.first_time) {
+          setShowWelcomePopup(true);
+        }
+      } catch (error) {
+        console.error('Error checking first time user:', error);
+      }
+    };
+
+    checkFirstTimeUser();
+  }, [supabase]);
+
+  useEffect(() => {
     setHasUserEmail(!!localStorage.getItem('userEmail'));
   }, []);
 
@@ -354,6 +384,23 @@ export default function Home() {
     // }
   };
 
+  const handleWelcomeClose = async () => {
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail) return;
+
+    try {
+      await supabase
+        .from('profiles')
+        .update({ first_time: false })
+        .eq('email', userEmail);
+    } catch (error) {
+      console.error('Error updating first time status:', error);
+    }
+
+    setShowWelcomePopup(false);
+    window.location.reload();
+  };
+
   return (
     <Layout>
       {/* Loading Screen */}
@@ -375,9 +422,7 @@ export default function Home() {
           </div>
         </div>
       )}
-<button onClick={handleAccount}>
-  get account
-</button>
+
       {/* Hero Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -759,105 +804,117 @@ export default function Home() {
           {/* Right Sidebar */}
           <div className="col-span-4 space-y-4">
             {/* Streak Display */}
-            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-8 shadow-lg transform hover:scale-102 transition-all duration-300 border border-purple-400/20">
-              {/* Header Section */}
-              <div className="flex items-center gap-6 mb-8">
-                <div className="relative">
-                  <div className="relative w-16 h-16 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-2xl shadow-inner">
-                    <FaFire className="text-4xl text-yellow-400 animate-pulse" />
-                    <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-1.5 shadow-lg">
-                      <FaCrown className="text-sm text-purple-900" />
+            {hasUserEmail && (
+              <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-8 shadow-lg transform hover:scale-102 transition-all duration-300 border border-purple-400/20">
+                {/* Header Section */}
+                <div className="flex items-center gap-6 mb-8">
+                  <div className="relative">
+                    <div className="relative w-16 h-16 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-2xl shadow-inner">
+                      <FaFire className="text-4xl text-yellow-400 animate-pulse" />
+                      <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-1.5 shadow-lg">
+                        <FaCrown className="text-sm text-purple-900" />
+                      </div>
                     </div>
                   </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-white mb-2">
+                      1-day streak
+                    </h3>
+                    <p className="text-purple-200 text-base">
+                      Keep going, champion! 🌟
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-3xl font-bold text-white mb-2">
-                    1-day streak
-                  </h3>
-                  <p className="text-purple-200 text-base">
-                    Keep going, champion! 🌟
-                  </p>
-                </div>
-              </div>
 
-              {/* Days of Week */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8">
-                <div className="grid grid-cols-7 gap-1">
-                  {daysOfWeek.map((day, index) => (
-                    <div 
-                      key={day}
-                      className="flex flex-col items-center"
-                    >
+                {/* Days of Week */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8">
+                  <div className="grid grid-cols-7 gap-1">
+                    {daysOfWeek.map((day, index) => (
                       <div 
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 mb-1 ${
-                          index === 2 
-                            ? 'bg-yellow-400 shadow-lg ring-2 ring-yellow-400/30' 
-                            : 'bg-white/10 hover:bg-white/20'
-                        }`}
+                        key={day}
+                        className="flex flex-col items-center"
                       >
-                        {index === 2 ? (
-                          <FaCheck className="text-purple-900 text-sm" />
-                        ) : (
-                          <span className={`text-xs font-medium ${
-                            index === 2 ? 'text-purple-900' : 'text-purple-200'
-                          }`}>
-                            {day}
-                          </span>
-                        )}
+                        <div 
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 mb-1 ${
+                            index === 2 
+                              ? 'bg-yellow-400 shadow-lg ring-2 ring-yellow-400/30' 
+                              : 'bg-white/10 hover:bg-white/20'
+                          }`}
+                        >
+                          {index === 2 ? (
+                            <FaCheck className="text-purple-900 text-sm" />
+                          ) : (
+                            <span className={`text-xs font-medium ${
+                              index === 2 ? 'text-purple-900' : 'text-purple-200'
+                            }`}>
+                              {day}
+                            </span>
+                          )}
+                        </div>
+                        <div className={`text-[9px] font-medium ${
+                          index === 2 ? 'text-yellow-400' : 'text-purple-200/70'
+                        }`}>
+                          {day}
+                        </div>
                       </div>
-                      <div className={`text-[9px] font-medium ${
-                        index === 2 ? 'text-yellow-400' : 'text-purple-200/70'
-                      }`}>
-                        {day}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Milestone Badges */}
-              <div className="overflow-x-auto pb-4 -mx-8 px-8">
-                <div className="flex gap-4 min-w-max">
-                  {milestones.map((milestone, index) => (
-                    <div 
-                      key={index} 
-                      className={`relative group overflow-hidden ${
-                        index === 0
-                          ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
-                          : 'bg-white/10 hover:bg-white/20'
-                      } rounded-xl p-4 transition-all duration-300 flex flex-col items-center justify-center w-[160px] h-[120px]`}
-                    >
-                      {/* Shine Effect */}
+                {/* Milestone Badges */}
+                <div className="overflow-x-auto pb-2 -mx-8 px-8 no-scrollbar">
+                  <div className="flex gap-3 min-w-max">
+                    {milestones.map((milestone, index) => (
                       <div 
-                        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${
-                          index === 0 
-                            ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent -rotate-45 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000' 
-                            : ''
-                        }`} 
-                      />
-                      
-                      <div className="relative text-center">
-                        <div className={`text-3xl mb-2 ${
-                          index === 0 ? '' : 'opacity-40'
-                        }`}>
-                          {milestone.icon}
-                        </div>
-                        <div className={`text-sm font-bold mb-1 ${
-                          index === 0 ? 'text-purple-900' : 'text-white'
-                        }`}>
-                          {milestone.days} days
-                        </div>
-                        <div className={`text-xs ${
-                          index === 0 ? 'text-purple-900/70' : 'text-purple-200/70'
-                        }`}>
-                          {milestone.title}
+                        key={index} 
+                        className={`relative group overflow-hidden ${
+                          index === 0
+                            ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
+                            : 'bg-white/10 hover:bg-white/20'
+                        } rounded-lg p-3 transition-all duration-300 flex flex-col items-center justify-center w-[120px] h-[100px]`}
+                      >
+                        {/* Shine Effect */}
+                        <div 
+                          className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${
+                            index === 0 
+                              ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent -rotate-45 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000' 
+                              : ''
+                          }`} 
+                        />
+                        
+                        <div className="relative text-center">
+                          <div className={`text-2xl mb-1.5 ${
+                            index === 0 ? '' : 'opacity-40'
+                          }`}>
+                            {milestone.icon}
+                          </div>
+                          <div className={`text-xs font-bold mb-0.5 ${
+                            index === 0 ? 'text-purple-900' : 'text-white'
+                          }`}>
+                            {milestone.days} days
+                          </div>
+                          <div className={`text-[10px] ${
+                            index === 0 ? 'text-purple-900/70' : 'text-purple-200/70'
+                          }`}>
+                            {milestone.title}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+
+                <style jsx global>{`
+                  .no-scrollbar::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                  }
+                `}</style>
               </div>
-            </div>
+            )}
 
             {/* Achievements Section */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
@@ -942,10 +999,7 @@ export default function Home() {
       {showWelcomePopup && (
         <WelcomePopup
           isOpen={showWelcomePopup}
-          onClose={() => {
-            setShowWelcomePopup(false);
-            window.location.reload(); // Reload after welcome popup is closed
-          }}
+          onClose={handleWelcomeClose}
         />
       )}
     </Layout>
