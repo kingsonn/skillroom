@@ -216,13 +216,13 @@ const [tokenclaim, setTokenclaim]= useState(false)
     setTokenclaim(true)
     return signedMessage;
   };
-  const balanceToken = async () => {
+  const balanceToken = async (address) => {
     if (!provider) {
       console.log("provider not initialized yet");
       return;
     }
     console.log("Sending Transaction...");
-    const signedMessage = await RPC.balanceToken(provider);
+    const signedMessage = await RPC.balanceToken(provider,address);
     console.log(signedMessage);
     return signedMessage;
   };

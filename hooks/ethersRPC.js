@@ -1078,7 +1078,7 @@ const getCertificate = async (provider) => {
         return error;
       }
 };
-const balanceToken = async (provider) => {
+const balanceToken = async (provider,address) => {
     try {
         const ethersProvider = new ethers.BrowserProvider(provider);
         const signer = await ethersProvider.getSigner();
@@ -1503,7 +1503,7 @@ const balanceToken = async (provider) => {
         ]
         const contract = new ethers.Contract(contractAddress, abi, signer);
     
-        const tx = await contract.balanceOf("0x1E53F1B3Cd8b7771BACee75c4c9C10a9Cc32E6a2");
+        const tx = await contract.balanceOf(address);
       
         return tx;
       } catch (error) {

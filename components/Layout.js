@@ -18,7 +18,7 @@ export default function Layout({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
-  const { login, logout,initt, user: web3AuthUser, web3auth,tokenclaim, provider, balanceToken } = useWeb3Auth();
+  const { login, logout,initt, user: web3AuthUser, web3auth,tokenclaim, provider, balanceToken, getAccounts } = useWeb3Auth();
   const [tokenBalance, setTokenBalance] = useState("0");
 
   useEffect(() => {
@@ -30,7 +30,8 @@ export default function Layout({ children }) {
     const fetchBalance = async () => {
       if (web3AuthUser) {
         try {
-          const balance = await balanceToken();
+          const address = await getAccounts();
+          const balance = await balanceToken(address);
           setTokenBalance(balance.toString());
           console.log(typeof balance);
         } catch (error) {
