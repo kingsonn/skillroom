@@ -198,7 +198,7 @@ export default function LearningPage() {
     let totalLessons = 0;
     let completedLessons = 0;
 
-    skill.modules.forEach(module => {
+    (skill?.modules || skill?.skill?.modules).forEach(module => {
         totalLessons += module.lessons.length;
         completedLessons += module.lessons.filter(lesson => {
             const progressKey = `${selectedSkill}.${module.name}.${lesson.name}`;
