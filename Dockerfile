@@ -14,12 +14,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set environment variables
-ENV NEXT_PUBLIC_SUPABASE_URL=https://uzufwojpgyxicaypshtj.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6dWZ3b2pwZ3l4aWNheXBzaHRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwODAxOTcsImV4cCI6MjA0OTY1NjE5N30.azYnTVbCUy2edOB8nt3NUuw-UF6CVgaYoidpPMFtiuE
-ENV NEXT_PUBLIC_LANGFLOW_API_TOKEN=AstraCS:KsJIgXpPBGQlUgTCscrUKmZJ:c011c832c39619c01666f6db5a60b7cebc93fd45e4ebae9db44e1c0887e453e0
-ENV NEXT_PUBLIC_LANGFLOW_API_URL=https://api.langflow.astra.datastax.com/lf/42ddac8d-fc81-42af-bfd2-ca48f2d02204/api/v1/run/sf1
-
 # Build the application
 ENV NODE_ENV=production
 RUN npm run build
