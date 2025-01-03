@@ -102,6 +102,24 @@ export default function Layout({ children }) {
         localStorage.setItem('userEmail', userInfo.email);
         setUserEmail(userInfo.email);
         await checkProfileExists(userInfo.email, userInfo.name);
+        const address = await getAccounts();
+        const balance = await balanceToken(address);
+        setTokenBalance(balance.toString());
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('first_time')
+            .eq('email', userEmail)
+            .single();
+  
+          if (error) throw error;
+  
+          if (data?.first_time) {
+            setShowWelcomePopup(true);
+          }
+        } catch (error) {
+          console.error('Error checking first time user:', error);
+        }
       }
     } catch (error) {
       console.error('Web3Auth login error:', error);
@@ -198,7 +216,7 @@ export default function Layout({ children }) {
                     onClick={handleWeb3Login}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                   >
-                    Connect Wallet
+                    Login
                   </button>
                 )}
               </>

@@ -91,11 +91,11 @@ const [tokenclaim, setTokenclaim]= useState(false)
           };
           
         const web3auth = new Web3Auth(web3AuthOptions);
-          setinitt(true);
-       
-
+        
+        
         setWeb3auth(web3auth);
         await web3auth.initModal(); 
+        setinitt(!initt);
         if (localStorage.getItem('userEmail')) {
             const provider = await web3auth.connect();
             setProvider(provider);

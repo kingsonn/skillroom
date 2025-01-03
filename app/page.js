@@ -258,35 +258,6 @@ export default function Home() {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    const checkFirstTimeUser = async () => {
-      const userEmail = localStorage.getItem('userEmail');
-      if (!userEmail) {
-        setHasUserEmail(false);
-        return;
-      }
-
-      setHasUserEmail(true);
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_time')
-          .eq('email', userEmail)
-          .single();
-
-        if (error) throw error;
-
-        if (data?.first_time) {
-          setShowWelcomePopup(true);
-        }
-      } catch (error) {
-        console.error('Error checking first time user:', error);
-      }
-    };
-
-    checkFirstTimeUser();
-  }, [supabase]);
 
   useEffect(() => {
     setHasUserEmail(!!localStorage.getItem('userEmail'));
@@ -553,12 +524,7 @@ export default function Home() {
                     Master new skills through AI-powered personalized learning paths.
                   </p>
                   <div className="flex gap-4">
-                    <button 
-                      onClick={() => setIsSignInModalOpen(true)}
-                      className="inline-flex items-center px-8 py-3 text-base font-semibold rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-purple-600 dark:text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                    >
-                      Sign In
-                    </button>
+                 
                   </div>
                 </motion.div>
               </div>

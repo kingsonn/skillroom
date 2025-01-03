@@ -56,7 +56,7 @@ export async function POST(request) {
     console.log('Request payload:', JSON.stringify(requestBody, null, 2));
 
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`https://api.langflow.astra.datastax.com/lf/094c622d-c27f-4177-a4fc-92c2c585b688/api/v1/run/2baa4466-2408-4abc-a2f7-b0e88a4a5201?stream=false`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
