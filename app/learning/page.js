@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Layout from "../../components/Layout";
 import { FiArrowLeft, FiPlay, FiBook, FiCheckCircle, FiLock, FiStar, FiAward, FiX, FiArrowRight, FiInfo } from 'react-icons/fi';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -9,7 +9,7 @@ import Chatbot from "../../components/Chatbot";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useWeb3Auth } from '../../context/Web3AuthContext';
-
+import { motion, AnimatePresence } from "framer-motion";
 export default function LearningPage() {
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you with your learning journey?", isBot: true },
@@ -31,13 +31,66 @@ export default function LearningPage() {
   const [loadingContent, setLoadingContent] = useState(false);
   const [markdownError, setMarkdownError] = useState(null);
   const supabase = createClientComponentClient();
+  const [showXPAnimation, setShowXPAnimation] = useState(false);
+  const [selectedPrerequisites, setSelectedPrerequisites] = useState({});
   const { login, isLoading, user, getAccounts, sendTransaction, ownerAddCertificate, getCertificate, claimToken, balanceToken } = useWeb3Auth();
+  const XPAnimation = ({ isVisible, onComplete }) => {
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{
+              opacity: 1,
+              y: -80,
+              scale: 1
+            }}
+            exit={{ opacity: 0, y: -120, scale: 0.8 }}
+            transition={{
+              duration: 0.8,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+            onAnimationComplete={onComplete}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+          >
+            <motion.div
+              animate={{
+                y: [-2, 2, -2]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="relative"
+            >
+              {/* Glow effect background */}
+              <div className="absolute inset-0 blur-2xl opacity-50 bg-gradient-to-r from-violet-600/50 via-purple-500/50 to-fuchsia-500/50" />
 
+              <div className="relative text-6xl font-black flex items-center gap-4 tracking-tight">
+                <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]">+</span>
+                <div className="flex items-center">
+                  <span className="bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(147,51,234,0.5)]">150</span>
+                  <span className="bg-gradient-to-r from-violet-500 via-purple-400 to-fuchsia-500 text-transparent bg-clip-text ml-2 drop-shadow-[0_0_10px_rgba(147,51,234,0.5)]">XP</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+  const togglePrerequisite = (prereq) => {
+    setSelectedPrerequisites((prev) => ({
+      ...prev,
+      [prereq]: !prev[prereq],
+    }));
+  };
   const [completionModal, setCompletionModal] = useState({ show: false, currentLesson: null, nextLesson: null });
   useEffect(() => {
     const a = calculateTotalLessonsAndProgress();
     console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
-}, [userProgress]); // This will run whenever userProgress changes
+  }, [userProgress]); // This will run whenever userProgress changes
   useEffect(() => {
     async function fetchUserSkills() {
       try {
@@ -61,7 +114,7 @@ export default function LearningPage() {
         }
 
         console.log('Fetched data:', data);
-        
+
         // Ensure skill_paths is always an array
         const skillPaths = Array.isArray(data?.skill_paths) ? data.skill_paths : [];
         const modules = Array.isArray(data?.modules) ? data.modules : [];
@@ -84,7 +137,9 @@ export default function LearningPage() {
 
     fetchUserSkills();
   }, []);
-
+  const handleSaveMasteryLevels = () => {
+    console.log("Mastery levels saved!");
+  };
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -146,11 +201,13 @@ export default function LearningPage() {
     }
   };
 
-  const handleNextTopic = () => {
+  const handleNextTopic = useCallback(() => {
     if (selectedLesson && currentTopicIndex < selectedLesson.topics.length - 1) {
       setCurrentTopicIndex(prev => prev + 1);
+      setShowXPAnimation(true);
+      setTimeout(() => setShowXPAnimation(false), 3000);
     }
-  };
+  }, [selectedLesson, currentTopicIndex]);
 
   const handlePreviousTopic = () => {
     if (currentTopicIndex > 0) {
@@ -166,31 +223,31 @@ export default function LearningPage() {
 
   const calculateModuleProgress = (moduleName) => {
     if (!userProgress || !selectedSkill) return 0;
-    
-    const module = moduleData?.find(skill => 
+
+    const module = moduleData?.find(skill =>
       skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
-    )?.modules?.find(m => m.name === moduleName) || 
-    moduleData?.find(skill => 
-      skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
-    )?.skill?.modules?.find(m => m.name === moduleName);
-    
+    )?.modules?.find(m => m.name === moduleName) ||
+      moduleData?.find(skill =>
+        skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
+      )?.skill?.modules?.find(m => m.name === moduleName);
+
     if (!module) return 0;
-    
+
     const totalLessons = module.lessons.length;
     if (totalLessons === 0) return 0;
-    
+
     const completedLessons = module.lessons.filter(lesson => {
       const progressKey = `${selectedSkill}.${moduleName}.${lesson.name}`;
       return userProgress[progressKey]?.status === 'completed';
     }).length;
-    
+
     return Math.round((completedLessons / totalLessons) * 100);
   };
   const calculateTotalLessonsAndProgress = () => {
     if (!userProgress || !selectedSkill) return { totalLessons: 0, completedLessons: 0 };
 
-    const skill = moduleData?.find(skill => 
-        skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
+    const skill = moduleData?.find(skill =>
+      skill?.name === selectedSkill || skill?.skill?.name === selectedSkill
     );
 
     if (!skill) return { totalLessons: 0, completedLessons: 0 };
@@ -199,11 +256,11 @@ export default function LearningPage() {
     let completedLessons = 0;
 
     (skill?.modules || skill?.skill?.modules).forEach(module => {
-        totalLessons += module.lessons.length;
-        completedLessons += module.lessons.filter(lesson => {
-            const progressKey = `${selectedSkill}.${module.name}.${lesson.name}`;
-            return userProgress[progressKey]?.status === 'completed';
-        }).length;
+      totalLessons += module.lessons.length;
+      completedLessons += module.lessons.filter(lesson => {
+        const progressKey = `${selectedSkill}.${module.name}.${lesson.name}`;
+        return userProgress[progressKey]?.status === 'completed';
+      }).length;
     });
     const storedTopics = JSON.parse(localStorage.getItem("completedCourses")) || [];
     // Check if the topic is already in the array
@@ -212,16 +269,16 @@ export default function LearningPage() {
         console.log("course completed");
         storedTopics.push(selectedSkill);
         localStorage.setItem("completedCourses", JSON.stringify(storedTopics));
-        ownerAddCertificate(getAccounts(),selectedSkill, "template");
+        ownerAddCertificate(getAccounts(), selectedSkill, "template");
       }
-      return {totalLessons, completedLessons}; // Exit the function without adding the duplicate
-    }else{
+      return { totalLessons, completedLessons }; // Exit the function without adding the duplicate
+    } else {
 
       console.log(`Topic  is already in the list.`);
     }
-    
+
     return { totalLessons, completedLessons };
-};
+  };
 
   const getNextLesson = (currentModule, currentLesson) => {
     const currentLessonIndex = currentModule.lessons.findIndex(l => l.name === currentLesson.name);
@@ -250,7 +307,7 @@ export default function LearningPage() {
         .eq('email', userEmail);
 
       if (error) throw error;
-      
+
       setUserProgress(newProgress);
       console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
       // Check for next lesson
@@ -334,11 +391,11 @@ export default function LearningPage() {
 
       console.log('Generating content for:', {
         topic,
-        skill: selectedSkill, 
+        skill: selectedSkill,
         lesson: selectedLesson?.name
       });
 
-      const response = await fetch(`/api/langflow/${selectedSkill=="Digital Marketing"?"digital":"generate"}`, {
+      const response = await fetch(`/api/langflow/${selectedSkill == "Digital Marketing" ? "digital" : "generate"}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -352,7 +409,7 @@ export default function LearningPage() {
       });
 
       const data = await response.json();
-console.log("this is data", data, 'this is response',response)
+      console.log("this is data", data, 'this is response', response)
       if (!response.ok) {
         throw new Error(data.error || `Server error: ${response.status}`);
       }
@@ -379,19 +436,19 @@ console.log("this is data", data, 'this is response',response)
       // Add consistent heading structure
       content = content.replace(/^# /gm, '### '); // Convert top-level headings to h3
       content = content.replace(/^## /gm, '#### '); // Convert second-level headings to h4
-      
+
       // Add custom classes for specific markdown elements
       content = content.replace(/^> /gm, '> {.quote} '); // Add class to blockquotes
       content = content.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>'); // Add class to inline code
-      
+
       // Add emojis for better visual hierarchy
       content = content.replace(/^### (.*)/gm, '### 🎯 $1'); // Add target emoji to main headings
       content = content.replace(/^#### (.*)/gm, '#### 📌 $1'); // Add pin emoji to subheadings
-      
+
       // Enhance lists
       content = content.replace(/^- /gm, '• '); // Replace dashes with bullets
       content = content.replace(/^(\d+)\. /gm, '$1️⃣ '); // Add number emojis to numbered lists
-      
+
       return content;
     } catch (error) {
       console.error('Error formatting markdown:', error);
@@ -407,7 +464,7 @@ console.log("this is data", data, 'this is response',response)
   const handleRemedialTopic = async (topic) => {
     const userEmail = localStorage.getItem('userEmail');
     if (!userEmail || !selectedSkill || !selectedModule || !selectedLesson) return;
-  
+
     try {
       // Get current modules
       const { data: profileData, error: profileError } = await supabase
@@ -415,9 +472,9 @@ console.log("this is data", data, 'this is response',response)
         .select('modules')
         .eq('email', userEmail)
         .single();
-  
+
       if (profileError) throw profileError;
-  
+
       // Update the modules by adding the remedial topic to the current lesson
       const updatedModules = profileData.modules.map(skill => {
         if ((skill.name || skill?.skill?.name) === selectedSkill) {
@@ -444,18 +501,18 @@ console.log("this is data", data, 'this is response',response)
         }
         return skill;
       });
-  
+
       // Update the database
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ modules: updatedModules })
         .eq('email', userEmail);
-  
+
       if (updateError) throw updateError;
-  
+
       // Update local state
       setModuleData(updatedModules);
-      
+
       // Update the selected lesson's topics in local state
       if (selectedLesson) {
         const updatedTopics = [...selectedLesson.topics];
@@ -530,7 +587,10 @@ console.log("this is data", data, 'this is response',response)
                         />
                       </div>
                     </div> */}
-
+                    <XPAnimation
+                      isVisible={showXPAnimation}
+                      onComplete={() => setShowXPAnimation(false)}
+                    />
                     {/* Topic Header */}
                     <div className="flex items-center justify-between mb-8">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center group">
@@ -541,13 +601,13 @@ console.log("this is data", data, 'this is response',response)
                           {selectedLesson.topics[currentTopicIndex]}
                         </span>
                       </h2>
-                      <div className="flex items-center space-x-2">
+                      {/* <div className="flex items-center space-x-2">
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           Topic {currentTopicIndex + 1} of {selectedLesson.topics.length}
                         </span>
-                      </div>
+                      </div> */}
                     </div>
-                    
+
                     {/* Loading State */}
                     {loadingContent ? (
                       <div className="flex flex-col items-center justify-center py-12">
@@ -563,87 +623,87 @@ console.log("this is data", data, 'this is response',response)
                         <p>{markdownError}</p>
                       </div>
                     ) : (
-                      <ReactMarkdown 
-                      remarkPlugins={[remarkGfm]}
-                      className="prose prose-purple dark:prose-invert max-w-none"
-                      components={{
-                        a: ({node, ...props}) => {
-                          // YouTube video link
-                          const youtubeMatch = props.href?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-                          if (youtubeMatch) {
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        className="prose prose-purple dark:prose-invert max-w-none"
+                        components={{
+                          a: ({ node, ...props }) => {
+                            // YouTube video link
+                            const youtubeMatch = props.href?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+                            if (youtubeMatch) {
+                              return (
+                                <div className="my-4 aspect-video rounded-lg overflow-hidden shadow-md">
+                                  <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="w-full"
+                                  />
+                                </div>
+                              );
+                            }
+
+                            // Image link
+                            const imageMatch = props.href?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                            if (imageMatch) {
+                              return (
+                                <div className="my-4">
+                                  <img
+                                    src={props.href}
+                                    alt={props.children}
+                                    className="rounded-lg shadow-md w-full object-cover max-h-[400px]"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              );
+                            }
+
+                            // Regular link
                             return (
-                              <div className="my-4 aspect-video rounded-lg overflow-hidden shadow-md">
-                                <iframe
-                                  width="100%"
-                                  height="100%"
-                                  src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
-                                  frameBorder="0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="w-full"
-                                />
-                              </div>
+                              <a
+                                {...props}
+                                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
                             );
-                          }
-                    
-                          // Image link
-                          const imageMatch = props.href?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-                          if (imageMatch) {
-                            return (
-                              <div className="my-4">
-                                <img
-                                  src={props.href}
-                                  alt={props.children}
-                                  className="rounded-lg shadow-md w-full object-cover max-h-[400px]"
-                                  loading="lazy"
-                                />
-                              </div>
-                            );
-                          }
-                    
-                          // Regular link
-                          return (
-                            <a 
-                              {...props} 
-                              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors" 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                            />
-                          );
-                        },
-                        blockquote: ({node, children}) => (
-                          <div className="my-4 border-l-4 border-purple-500 pl-4 italic bg-purple-50 dark:bg-purple-900/20 p-4 rounded-r-lg">
-                            {children}
-                          </div>
-                        ),
-                        code: ({node, inline, children}) => (
-                          inline ? 
-                            <code className="bg-purple-100 dark:bg-purple-900/30 px-1 py-0.5 rounded text-sm">{children}</code> :
-                            <div className="my-4 bg-gray-900 rounded-lg overflow-hidden">
-                              <pre className="p-4 text-sm text-gray-100 overflow-x-auto">
-                                <code>{children}</code>
-                              </pre>
+                          },
+                          blockquote: ({ node, children }) => (
+                            <div className="my-4 border-l-4 border-purple-500 pl-4 italic bg-purple-50 dark:bg-purple-900/20 p-4 rounded-r-lg">
+                              {children}
                             </div>
-                        ),
-                        h1: ({node, ...props}) => (
-                          <h1 {...props} className="text-3xl font-bold mb-4 text-gray-900 dark:text-white" />
-                        ),
-                        h2: ({node, ...props}) => (
-                          <h2 {...props} className="text-2xl font-semibold mb-3 text-gray-800 dark:text-gray-100" />
-                        ),
-                        h3: ({node, ...props}) => (
-                          <h3 {...props} className="text-xl font-medium mb-2 text-gray-700 dark:text-gray-200" />
-                        ),
-                        ul: ({node, ...props}) => (
-                          <ul {...props} className="list-disc list-inside space-y-2 my-4" />
-                        ),
-                        ol: ({node, ...props}) => (
-                          <ol {...props} className="list-decimal list-inside space-y-2 my-4" />
-                        )
-                      }}
-                    >
-    {cleanupContent(currentTopicContent)}
-                    </ReactMarkdown>
+                          ),
+                          code: ({ node, inline, children }) => (
+                            inline ?
+                              <code className="bg-purple-100 dark:bg-purple-900/30 px-1 py-0.5 rounded text-sm">{children}</code> :
+                              <div className="my-4 bg-gray-900 rounded-lg overflow-hidden">
+                                <pre className="p-4 text-sm text-gray-100 overflow-x-auto">
+                                  <code>{children}</code>
+                                </pre>
+                              </div>
+                          ),
+                          h1: ({ node, ...props }) => (
+                            <h1 {...props} className="text-3xl font-bold mb-4 text-gray-900 dark:text-white" />
+                          ),
+                          h2: ({ node, ...props }) => (
+                            <h2 {...props} className="text-2xl font-semibold mb-3 text-gray-800 dark:text-gray-100" />
+                          ),
+                          h3: ({ node, ...props }) => (
+                            <h3 {...props} className="text-xl font-medium mb-2 text-gray-700 dark:text-gray-200" />
+                          ),
+                          ul: ({ node, ...props }) => (
+                            <ul {...props} className="list-disc list-inside space-y-2 my-4" />
+                          ),
+                          ol: ({ node, ...props }) => (
+                            <ol {...props} className="list-decimal list-inside space-y-2 my-4" />
+                          )
+                        }}
+                      >
+                        {cleanupContent(currentTopicContent)}
+                      </ReactMarkdown>
                     )}
                   </div>
 
@@ -652,11 +712,10 @@ console.log("this is data", data, 'this is response',response)
                     <button
                       onClick={handlePreviousTopic}
                       disabled={currentTopicIndex === 0}
-                      className={`px-4 py-2 rounded-lg flex items-center ${
-                        currentTopicIndex === 0
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                      className={`px-4 py-2 rounded-lg flex items-center ${currentTopicIndex === 0
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
                     >
                       <FiArrowLeft className="mr-2" /> Previous Topic
                     </button>
@@ -694,10 +753,10 @@ console.log("this is data", data, 'this is response',response)
                       Follow this roadmap to master {selectedSkill}
                     </p>
                   </div>
-                  
+
                   <div className="space-y-6">
-                  {(moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.modules || moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.skill?.modules)?.map((module, index) => (
-                    <div
+                    {(moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.modules || moduleData?.find(skill => (skill.name || skill?.skill?.name) === selectedSkill)?.skill?.modules)?.map((module, index) => (
+                      <div
                         key={index}
                         onClick={() => handleModuleClick(module)}
                         className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
@@ -748,17 +807,17 @@ console.log("this is data", data, 'this is response',response)
                       Choose a skill to begin your learning journey
                     </p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {moduleData?.map((skill, index) => (
-                      
+
                       <div
                         key={index}
                         onClick={() => handleSkillClick(skill.name || skill?.skill.name)}
                         className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer p-6"
                       >
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold">{skill.name ||skill?.skill.name}</h3>
+                          <h3 className="text-xl font-semibold">{skill.name || skill?.skill.name}</h3>
                           <FiArrowRight className="text-xl text-purple-500" />
                         </div>
                         {/* <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -822,111 +881,206 @@ console.log("this is data", data, 'this is response',response)
 
                   {/* Lesson Timeline */}
                   <div className="relative">
-                    {selectedModule.lessons.map((lesson, index) => {
-                      const status = getLessonStatus(selectedModule.name, lesson.name);
-                      const isAvailable = isLessonAvailable(selectedModule.name, index, selectedModule.lessons);
-                      const isActive = index === getNextAvailableLesson(selectedModule.name, selectedModule.lessons);
+  {selectedModule.lessons.map((lesson, index) => {
+    const status = getLessonStatus(selectedModule.name, lesson.name);
+    const isAvailable = isLessonAvailable(selectedModule.name, index, selectedModule.lessons);
+    const isActive = index === getNextAvailableLesson(selectedModule.name, selectedModule.lessons);
 
-                      return (
-                        <div 
-                          key={index}
-                          className={`border dark:border-gray-700 rounded-lg p-4 mb-4 relative ${
-                            isActive ? 'ring-2 ring-purple-500' : ''
-                          } ${!isAvailable ? 'opacity-50' : ''}`}
-                        >
-                          {/* Timeline connector */}
-                          {index !== selectedModule.lessons.length - 1 && (
-                            <div className="absolute left-8 bottom-0 w-0.5 h-4 bg-gray-200 dark:bg-gray-700 -mb-4 z-0"></div>
-                          )}
-                          
-                          <div className="flex items-start space-x-4">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              status === 'completed' 
-                                ? 'bg-green-100 text-green-500' 
-                                : status === 'in_progress'
-                                ? 'bg-purple-100 text-purple-500'
-                                : 'bg-gray-100 text-gray-400'
-                            }`}>
-                              {status === 'completed' 
-                                ? <FiCheckCircle className="text-lg" />
-                                : status === 'in_progress'
-                                ? <FiPlay className="text-lg" />
-                                : index + 1
-                              }
-                            </div>
-                            
-                            <div className="flex-grow">
-                              <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-lg font-semibold">{lesson.name}</h3>
-                                <div className="flex items-center space-x-2">
-                                  {status === 'completed' ? (
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm text-green-500">Completed</span>
-                                      {isActive && (
-                                        <button
-                                          onClick={() => handleStartLesson(lesson)}
-                                          className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                                        >
-                                          Restart
-                                        </button>
-                                      )}
-                                    </div>
-                                  ) : status === 'in_progress' ? (
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm text-purple-500">In Progress</span>
-                                      {isActive && (
-                                        <button
-                                          onClick={() => handleCompleteLesson(lesson)}
-                                          className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                                        >
-                                          Complete
-                                        </button>
-                                      )}
-                                    </div>
-                                  ) : isAvailable ? (
-                                    isActive && (
-                                      <button
-                                        onClick={() => handleStartLesson(lesson)}
-                                        className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-                                      >
-                                        Start Lesson
-                                      </button>
-                                    )
-                                  ) : (
-                                    <span className="flex items-center text-sm text-gray-500">
-                                      <FiLock className="mr-1" /> Locked
-                                    </span>
+    return (
+      <div
+        key={index}
+        className={`border dark:border-gray-700 rounded-lg p-4 mb-4 relative ${isActive ? 'ring-2 ring-purple-500' : ''
+          } ${!isAvailable ? 'opacity-50' : ''}`}
+      >
+        {/* Timeline connector */}
+        {index !== selectedModule.lessons.length - 1 && (
+          <div className="absolute left-8 bottom-0 w-0.5 h-4 bg-gray-200 dark:bg-gray-700 -mb-4 z-0"></div>
+        )}
+
+        <div className="flex items-start space-x-4">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${status === 'completed'
+            ? 'bg-green-100 text-green-500'
+            : status === 'in_progress'
+              ? 'bg-purple-100 text-purple-500'
+              : 'bg-gray-100 text-gray-400'
+            }`}>
+            {status === 'completed'
+              ? <FiCheckCircle className="text-lg" />
+              : status === 'in_progress'
+                ? <FiPlay className="text-lg animate-pulse" />
+                : <span className="text-lg font-bold">{index + 1}</span>
+            }
+          </div>
+
+          <div className="flex-grow">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold">{lesson.name}</h3>
+              <div className="flex items-center space-x-2">
+                {status === 'completed' ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-green-500">Completed</span>
+                    {isActive && (
+                      <button
+                        onClick={() => handleStartLesson(lesson)}
+                        className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Restart
+                      </button>
+                    )}
+                  </div>
+                ) : status === 'in_progress' ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-purple-500">In Progress</span>
+                    {isActive && (
+                      <button
+                        onClick={() => handleCompleteLesson(lesson)}
+                        className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                      >
+                        Complete
+                      </button>
+                    )}
+                  </div>
+                ) : isAvailable ? (
+                  isActive && (
+                    <button
+                      onClick={() => handleStartLesson(lesson)}
+                      className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                    >
+                      Start Lesson
+                    </button>
+                  )
+                ) : (
+                  <span className="flex items-center text-sm text-gray-500">
+                    <FiLock className="mr-1" /> Locked
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {isActive && (
+              <div className="space-y-4 mt-4">
+             <div className="bg-yellow-100 dark:bg-yellow-200 rounded-lg p-4">
+    <h4 className="font-semibold text-lg text-gray-800  mb-2">Practical Outcome</h4>
+    <p className="text-gray-600 ">{lesson["practical outcome"]}</p>
+  </div>
+  <div className="bg-blue-100 dark:bg-blue-200 rounded-lg p-4">
+    <h4 className="font-semibold text-lg text-gray-800 mb-2">Mission</h4>
+    <p className="text-gray-600">This is a template text for the mission section. It provides an overview of what the mission entails and the objectives to be achieved.</p>
+  </div>
+
+                {lesson.prerequisites && lesson.prerequisites.length > 0 && (
+                 <div className="bg-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-8 relative">
+                 <button
+                   onClick={() => handleSaveMasteryLevels()}
+                   className="absolute top-4 right-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                 >
+                   Save Mastery Levels
+                 </button>
+               
+                 <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Prerequisites</h4>
+                 <ul className="flex flex-wrap gap-3 mb-6">
+                   {lesson.prerequisites.map((prereq, index) => (
+                     <li
+                       key={index}
+                       onClick={() => togglePrerequisite(prereq)}
+                       className={`cursor-pointer p-3 rounded-lg border transition-all dark:bg-gray-800  dark:text-gray-200 duration-200 ease-in-out ${
+                         selectedPrerequisites[prereq] ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-gray-300 text-gray-700'
+                       }`}
+                     >
+                       <div className="flex items-center">
+                         {selectedPrerequisites[prereq] && (
+                           <span className="mr-1">
+                             <FiCheckCircle className="text-green-500" />
+                           </span>
+                         )}
+                         <span>{prereq}</span>
+                       </div>
+                     </li>
+                   ))}
+                 </ul>
+               
+                 <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Topics Covered</h4>
+                 <ul className="space-y-3">
+                   {lesson.topics.map((topic, topicIndex) => (
+                     <li key={topicIndex} className="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out transform hover:-translate-y-1">
+                       <span className="text-gray-900 dark:text-white font-medium">{topic}</span>
+                       <div className="flex items-center space-x-2">
+                         <label className="text-sm text-gray-600 dark:text-gray-300">Basic</label>
+                         <input type="range" min="1" max="3" defaultValue="2" className="slider" />
+                         <label className="text-sm text-gray-600 dark:text-gray-300">Advanced</label>
+                       </div>
+                     </li>
+                   ))}
+                 </ul>
+               </div>
                                   )}
-                                </div>
-                              </div>
 
-                              {isActive && (
-                                <div className="space-y-4 mt-4">
-                                  <div>
-                                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Practical Outcome</h4>
-                                    <p className="text-gray-600 dark:text-gray-400">{lesson["practical outcome"]}</p>
-                                  </div>
+<style jsx>{`
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, #3b82f6, #6366f1);
+    border-radius: 5px;
+    outline: none;
+    transition: background 0.3s ease-in-out;
+  }
 
-                                  {/* {lesson.prerequisites && lesson.prerequisites.length > 0 && (
-                                    <div>
-                                      <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Prerequisites</h4>
-                                      <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
-                                        {lesson.prerequisites.map((prereq, prereqIndex) => (
-                                          <li key={prereqIndex}>{prereq}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )} */}
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border: 2px solid #6366f1;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  }
 
-                                  <div>
-                                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Topics Covered</h4>
-                                    <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
-                                      {lesson.topics.map((topic, topicIndex) => (
-                                        <li key={topicIndex}>{topic}</li>
-                                      ))}
-                                    </ul>
-                                  </div>
+  .slider::-webkit-slider-thumb:hover {
+    background: #e5e7eb;
+    transform: scale(1.1);
+  }
 
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border: 2px solid #6366f1;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  }
+
+  .slider::-moz-range-thumb:hover {
+    background: #e5e7eb;
+    transform: scale(1.1);
+  }
+`}</style>
+
+{/* <div>
+  <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-4">Topics Covered</h4>
+  <ul className="space-y-3">
+    {lesson.topics.map((topic, topicIndex) => (
+      <li key={topicIndex} className="flex justify-between items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out transform hover:-translate-y-1">
+        <span className="text-gray-900 dark:text-white font-medium">{topic}</span>
+        <div className="flex items-center space-x-2">
+          <label className="text-sm text-gray-600 dark:text-gray-300">Basic</label>
+          <input type="range" min="1" max="3" defaultValue="2" className="slider" />
+          <label className="text-sm text-gray-600 dark:text-gray-300">Advanced</label>
+        </div>
+      </li>
+    ))}
+  </ul>
+  <button
+    onClick={() => handleSaveMasteryLevels()}
+    className="mt-6 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:bg-gradient-to-l hover:from-indigo-600 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+  >
+    Save Mastery Levels
+  </button>
+</div> */}
+ 
                                   {status !== 'not_started' && (
                                     <div className="text-sm text-gray-500">
                                       {status === 'completed' ? (
@@ -988,7 +1142,7 @@ console.log("this is data", data, 'this is response',response)
                   <p className="text-gray-600 dark:text-gray-400 mb-6">
                     Congratulations on completing {completionModal.currentLesson.name}!
                   </p>
-                  
+
                   <div className="space-y-4">
                     {completionModal.nextLesson ? (
                       <>
@@ -1030,13 +1184,13 @@ console.log("this is data", data, 'this is response',response)
 
           {/* Fixed Chat Bot */}
           {/* <div className="hidden lg:block w-96 fixed top-16 right-0 bottom-0 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700"> */}
-            {/* <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          {/* <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Learning Assistant</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">Ask me anything about your courses</p>
             </div> */}
-            
-            {/* Chat Messages */}
-            {/* <div className="flex-1 p-4 space-y-4 overflow-y-auto h-[calc(100vh-13rem)]">
+
+          {/* Chat Messages */}
+          {/* <div className="flex-1 p-4 space-y-4 overflow-y-auto h-[calc(100vh-13rem)]">
               {messages.map((message, index) => (
                 <div key={index} className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}>
                   <div className={`max-w-[80%] p-3 rounded-lg ${
@@ -1049,13 +1203,13 @@ console.log("this is data", data, 'this is response',response)
                 </div>
               ))}
             </div> */}
-<Chatbot 
-  topic={selectedLesson?.name || selectedModule?.name || selectedSkill} 
-  studyMaterial={currentTopicContent}
-  onRemedialTopic={handleRemedialTopic}
-/>
-            {/* Message Input */}
-            {/* <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <Chatbot
+            topic={selectedLesson?.name || selectedModule?.name || selectedSkill}
+            studyMaterial={currentTopicContent}
+            onRemedialTopic={handleRemedialTopic}
+          />
+          {/* Message Input */}
+          {/* <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <form onSubmit={handleSendMessage} className="flex gap-2">
                 <input
                   type="text"
