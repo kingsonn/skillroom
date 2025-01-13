@@ -11,7 +11,7 @@ export async function POST(request) {
       profile,
       email
     });
-    const response = await fetch(`http://localhost:5000/generate-simulation`, {
+    const response = await fetch(`https://skillroom-backend-823425209748.us-central1.run.app/generate-simulation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

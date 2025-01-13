@@ -5,7 +5,7 @@ export async function POST(request) {
     const body = await request.json();
     const { simulation, answers} = body;
 
-    const response = await fetch(`http://localhost:5000/generate-feedback`, {
+    const response = await fetch(`https://skillroom-backend-823425209748.us-central1.run.app/generate-feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
