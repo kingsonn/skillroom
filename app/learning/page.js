@@ -10,7 +10,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useWeb3Auth } from '../../context/Web3AuthContext';
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from 'next/navigation';
+
 export default function LearningPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you with your learning journey?", isBot: true },
   ]);
@@ -33,6 +36,7 @@ export default function LearningPage() {
   const supabase = createClientComponentClient();
   const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [selectedPrerequisites, setSelectedPrerequisites] = useState({});
+  const [userProfile, setUserProfile] = useState(null);
   const { login, isLoading, user, getAccounts, sendTransaction, ownerAddCertificate, getCertificate, claimToken, balanceToken } = useWeb3Auth();
   const XPAnimation = ({ isVisible, onComplete }) => {
     return (
@@ -89,7 +93,6 @@ export default function LearningPage() {
   const [completionModal, setCompletionModal] = useState({ show: false, currentLesson: null, nextLesson: null });
   useEffect(() => {
     const a = calculateTotalLessonsAndProgress();
-    console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
   }, [userProgress]); // This will run whenever userProgress changes
   useEffect(() => {
     async function fetchUserSkills() {
@@ -104,7 +107,7 @@ export default function LearningPage() {
         console.log('Fetching data for email:', userEmail);
         const { data, error } = await supabase
           .from('profiles')
-          .select('skill_paths, modules, progress')
+          .select('skill_paths, modules, progress, professional_profile')
           .eq('email', userEmail)
           .single();
 
@@ -119,9 +122,9 @@ export default function LearningPage() {
         const skillPaths = Array.isArray(data?.skill_paths) ? data.skill_paths : [];
         const modules = Array.isArray(data?.modules) ? data.modules : [];
         const progress = data?.progress || {};
-
+        const profile = data?.professional_profile || {};
         console.log('Processed data:', { skillPaths, modules, progress });
-
+        setUserProfile(profile);
         setUserSkills(skillPaths);
         setModuleData(modules);
         setUserProgress(progress);
@@ -284,10 +287,31 @@ export default function LearningPage() {
     const currentLessonIndex = currentModule.lessons.findIndex(l => l.name === currentLesson.name);
     return currentModule.lessons[currentLessonIndex + 1] || null;
   };
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCompleteLesson = async (lesson) => {
     const userEmail = localStorage.getItem('userEmail');
     if (!userEmail) return;
+    console.log(lesson["practical outcome"])
+    setIsSubmitting(true);
+    setShowNavigationModal(true);
+
+    const response = await fetch(`/api/langflow/agents`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+      prac_outcome: lesson["practical outcome"],
+      skill: selectedSkill,
+      topic: lesson.name, 
+      profile:userProfile,
+      email: userEmail, 
+    })
+    });
+    console.log("success",response);
+    setIsSubmitting(false);
 
     const progressKey = `${selectedSkill}.${selectedModule.name}.${lesson.name}`;
     const newProgress = {
@@ -309,7 +333,6 @@ export default function LearningPage() {
       if (error) throw error;
 
       setUserProgress(newProgress);
-      console.log('Total Lessons:', a.totalLessons, 'Completed Lessons:', a.completedLessons);
       // Check for next lesson
       const nextLesson = getNextLesson(selectedModule, lesson);
       if (nextLesson) {
@@ -808,8 +831,14 @@ export default function LearningPage() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {moduleData?.map((skill, index) => (
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent"></div>
+                      <p className="mt-4 text-gray-600 dark:text-gray-400 animate-pulse">Loading skill quests...</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {moduleData?.map((skill, index) => (
 
                       <div
                         key={index}
@@ -831,6 +860,7 @@ export default function LearningPage() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               )}
             </div>
@@ -881,141 +911,150 @@ export default function LearningPage() {
 
                   {/* Lesson Timeline */}
                   <div className="relative">
-  {selectedModule.lessons.map((lesson, index) => {
-    const status = getLessonStatus(selectedModule.name, lesson.name);
-    const isAvailable = isLessonAvailable(selectedModule.name, index, selectedModule.lessons);
-    const isActive = index === getNextAvailableLesson(selectedModule.name, selectedModule.lessons);
+                    {selectedModule.lessons.map((lesson, index) => {
+                      const status = getLessonStatus(selectedModule.name, lesson.name);
+                      const isAvailable = isLessonAvailable(selectedModule.name, index, selectedModule.lessons);
+                      const isActive = index === getNextAvailableLesson(selectedModule.name, selectedModule.lessons);
 
-    return (
-      <div
-        key={index}
-        className={`border dark:border-gray-700 rounded-lg p-4 mb-4 relative ${isActive ? 'ring-2 ring-purple-500' : ''
-          } ${!isAvailable ? 'opacity-50' : ''}`}
-      >
-        {/* Timeline connector */}
-        {index !== selectedModule.lessons.length - 1 && (
-          <div className="absolute left-8 bottom-0 w-0.5 h-4 bg-gray-200 dark:bg-gray-700 -mb-4 z-0"></div>
-        )}
+                      return (
+                        <div
+                          key={index}
+                          className={`border dark:border-gray-700 rounded-lg p-4 mb-4 relative ${isActive ? 'ring-2 ring-purple-500' : ''
+                            } ${!isAvailable ? 'opacity-50' : ''}`}
+                        >
+                          {/* Timeline connector */}
+                          {index !== selectedModule.lessons.length - 1 && (
+                            <div className="absolute left-8 bottom-0 w-0.5 h-4 bg-gray-200 dark:bg-gray-700 -mb-4 z-0"></div>
+                          )}
 
-        <div className="flex items-start space-x-4">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${status === 'completed'
-            ? 'bg-green-100 text-green-500'
-            : status === 'in_progress'
-              ? 'bg-purple-100 text-purple-500'
-              : 'bg-gray-100 text-gray-400'
-            }`}>
-            {status === 'completed'
-              ? <FiCheckCircle className="text-lg" />
-              : status === 'in_progress'
-                ? <FiPlay className="text-lg animate-pulse" />
-                : <span className="text-lg font-bold">{index + 1}</span>
-            }
-          </div>
+                          <div className="flex items-start space-x-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${status === 'completed'
+                              ? 'bg-green-100 text-green-500'
+                              : status === 'in_progress'
+                                ? 'bg-purple-100 text-purple-500'
+                                : 'bg-gray-100 text-gray-400'
+                              }`}>
+                              {status === 'completed'
+                                ? <FiCheckCircle className="text-lg" />
+                                : status === 'in_progress'
+                                  ? <FiPlay className="text-lg animate-pulse" />
+                                  : <span className="text-lg font-bold">{index + 1}</span>
+                              }
+                            </div>
 
-          <div className="flex-grow">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold">{lesson.name}</h3>
-              <div className="flex items-center space-x-2">
-                {status === 'completed' ? (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-green-500">Completed</span>
-                    {isActive && (
-                      <button
-                        onClick={() => handleStartLesson(lesson)}
-                        className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                      >
-                        Restart
-                      </button>
-                    )}
-                  </div>
-                ) : status === 'in_progress' ? (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-purple-500">In Progress</span>
-                    {isActive && (
-                      <button
-                        onClick={() => handleCompleteLesson(lesson)}
-                        className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                      >
-                        Complete
-                      </button>
-                    )}
-                  </div>
-                ) : isAvailable ? (
-                  isActive && (
-                    <button
-                      onClick={() => handleStartLesson(lesson)}
-                      className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-                    >
-                      Start Lesson
-                    </button>
-                  )
-                ) : (
-                  <span className="flex items-center text-sm text-gray-500">
-                    <FiLock className="mr-1" /> Locked
-                  </span>
-                )}
-              </div>
-            </div>
+                            <div className="flex-grow">
+                              <div className="flex items-center justify-between mb-2">
+                                <h3 className="text-lg font-semibold">{lesson.name}</h3>
+                                <div className="flex items-center space-x-2">
+                                  {status === 'completed' ? (
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm text-green-500">Completed</span>
+                                      {isActive && (
+                                        <button
+                                          onClick={() => handleStartLesson(lesson)}
+                                          className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                                        >
+                                          Restart
+                                        </button>
+                                      )}
+                                    </div>
+                                  ) : status === 'in_progress' ? (
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm text-purple-500">In Progress</span>
+                                      {isActive && (
+                                        <button
+                                          onClick={() => handleCompleteLesson(lesson)}
+                                          className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                        >
+                                          Complete
+                                        </button>
+                                      )}
+                                    </div>
+                                  ) : isAvailable ? (
+                                    isActive && (
+                                      <button
+                                        onClick={() => handleStartLesson(lesson)}
+                                        className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                                      >
+                                        Start Lesson
+                                      </button>
+                                    )
+                                  ) : (
+                                    <span className="flex items-center text-sm text-gray-500">
+                                      <FiLock className="mr-1" /> Locked
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
 
-            {isActive && (
-              <div className="space-y-4 mt-4">
-             <div className="bg-yellow-100 dark:bg-yellow-200 rounded-lg p-4">
-    <h4 className="font-semibold text-lg text-gray-800  mb-2">Practical Outcome</h4>
-    <p className="text-gray-600 ">{lesson["practical outcome"]}</p>
-  </div>
-  <div className="bg-blue-100 dark:bg-blue-200 rounded-lg p-4">
-    <h4 className="font-semibold text-lg text-gray-800 mb-2">Mission</h4>
-    <p className="text-gray-600">This is a template text for the mission section. It provides an overview of what the mission entails and the objectives to be achieved.</p>
-  </div>
+                              {isActive && (
+                                <div className="space-y-4 mt-4">
+                                  <div className="bg-yellow-100 dark:bg-yellow-200 rounded-lg p-4">
+                                    <h4 className="font-semibold text-lg text-gray-800  mb-2">Practical Outcome</h4>
+                                    <p className="text-gray-600 ">{lesson["practical outcome"]}</p>
+                                  </div>
+                                  <div className="bg-blue-100 dark:bg-blue-200 rounded-lg p-4">
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <h4 className="font-semibold text-lg text-gray-800 mb-2">Mission</h4>
+                                        <p className="text-gray-600">This is a template text for the mission section. It provides an overview of what the mission entails and the objectives to be achieved.</p>
+                                      </div>
+                                      <button
+                                        onClick={() => handleCompleteLesson(selectedLesson)}
+                                        className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center"
+                                      >
+                                        <FiPlay className="mr-2" /> Start
+                                      </button>
+                                    </div>
+                                  </div>
 
-                {lesson.prerequisites && lesson.prerequisites.length > 0 && (
-                 <div className="bg-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-8 relative">
-                 <button
-                   onClick={() => handleSaveMasteryLevels()}
-                   className="absolute top-4 right-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-                 >
-                   Save Mastery Levels
-                 </button>
-               
-                 <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Prerequisites</h4>
-                 <ul className="flex flex-wrap gap-3 mb-6">
-                   {lesson.prerequisites.map((prereq, index) => (
-                     <li
-                       key={index}
-                       onClick={() => togglePrerequisite(prereq)}
-                       className={`cursor-pointer p-3 rounded-lg border transition-all dark:bg-gray-800  dark:text-gray-200 duration-200 ease-in-out ${
-                         selectedPrerequisites[prereq] ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-gray-300 text-gray-700'
-                       }`}
-                     >
-                       <div className="flex items-center">
-                         {selectedPrerequisites[prereq] && (
-                           <span className="mr-1">
-                             <FiCheckCircle className="text-green-500" />
-                           </span>
-                         )}
-                         <span>{prereq}</span>
-                       </div>
-                     </li>
-                   ))}
-                 </ul>
-               
-                 <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Topics Covered</h4>
-                 <ul className="space-y-3">
-                   {lesson.topics.map((topic, topicIndex) => (
-                     <li key={topicIndex} className="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out transform hover:-translate-y-1">
-                       <span className="text-gray-900 dark:text-white font-medium">{topic}</span>
-                       <div className="flex items-center space-x-2">
-                         <label className="text-sm text-gray-600 dark:text-gray-300">Basic</label>
-                         <input type="range" min="1" max="3" defaultValue="2" className="slider" />
-                         <label className="text-sm text-gray-600 dark:text-gray-300">Advanced</label>
-                       </div>
-                     </li>
-                   ))}
-                 </ul>
-               </div>
+                                  {lesson.prerequisites && lesson.prerequisites.length > 0 && (
+                                    <div className="bg-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-8 relative">
+                                      <button
+                                        onClick={() => handleSaveMasteryLevels()}
+                                        className="absolute top-4 right-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                                      >
+                                        Save Mastery Levels
+                                      </button>
+
+                                      <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Prerequisites</h4>
+                                      <ul className="flex flex-wrap gap-3 mb-6">
+                                        {lesson.prerequisites.map((prereq, index) => (
+                                          <li
+                                            key={index}
+                                            onClick={() => togglePrerequisite(prereq)}
+                                            className={`cursor-pointer p-3 rounded-lg border transition-all dark:bg-gray-800  dark:text-gray-200 duration-200 ease-in-out ${selectedPrerequisites[prereq] ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-gray-300 text-gray-700'
+                                              }`}
+                                          >
+                                            <div className="flex items-center">
+                                              {selectedPrerequisites[prereq] && (
+                                                <span className="mr-1">
+                                                  <FiCheckCircle className="text-green-500" />
+                                                </span>
+                                              )}
+                                              <span>{prereq}</span>
+                                            </div>
+                                          </li>
+                                        ))}
+                                      </ul>
+
+                                      <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Topics Covered</h4>
+                                      <ul className="space-y-3">
+                                        {lesson.topics.map((topic, topicIndex) => (
+                                          <li key={topicIndex} className="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out transform hover:-translate-y-1">
+                                            <span className="text-gray-900 dark:text-white font-medium">{topic}</span>
+                                            <div className="flex items-center space-x-2">
+                                              <label className="text-sm text-gray-600 dark:text-gray-300">Basic</label>
+                                              <input type="range" min="1" max="3" defaultValue="2" className="slider" />
+                                              <label className="text-sm text-gray-600 dark:text-gray-300">Advanced</label>
+                                            </div>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
                                   )}
 
-<style jsx>{`
+                                  <style jsx>{`
   .slider {
     -webkit-appearance: none;
     width: 100%;
@@ -1059,7 +1098,7 @@ export default function LearningPage() {
   }
 `}</style>
 
-{/* <div>
+                                  {/* <div>
   <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-4">Topics Covered</h4>
   <ul className="space-y-3">
     {lesson.topics.map((topic, topicIndex) => (
@@ -1080,7 +1119,7 @@ export default function LearningPage() {
     Save Mastery Levels
   </button>
 </div> */}
- 
+
                                   {status !== 'not_started' && (
                                     <div className="text-sm text-gray-500">
                                       {status === 'completed' ? (
@@ -1208,6 +1247,72 @@ export default function LearningPage() {
             studyMaterial={currentTopicContent}
             onRemedialTopic={handleRemedialTopic}
           />
+         {showNavigationModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+        <div className="text-center">
+          {isSubmitting ? (
+            <>
+              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Submitting...
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                Please wait while we process your completion
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Lesson Completed! 🎉
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                Great job! Where would you like to go next?
+              </p>
+              <div className="space-y-4">
+                <button
+                  onClick={() => {
+                    setShowNavigationModal(false);
+                    router.push('/job-simulation');
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl px-6 py-3 font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <span>Go to Mission</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNavigationModal(false);
+                  }}
+                  className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl px-6 py-3 font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <span>Continue Module</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+              <button
+                onClick={() => setShowNavigationModal(false)}
+                className="mt-6 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+              >
+                Close
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )}
           {/* Message Input */}
           {/* <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <form onSubmit={handleSendMessage} className="flex gap-2">

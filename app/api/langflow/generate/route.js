@@ -44,7 +44,7 @@ export async function POST(request) {
       hasToken: !!process.env.NEXT_PUBLIC_LANGFLOW_API_TOKEN
     });
 
-    const apiUrl = `https://api.langflow.astra.datastax.com/lf/094c622d-c27f-4177-a4fc-92c2c585b688/api/v1/run/2baa4466-2408-4abc-a2f7-b0e88a4a5201?stream=false`;
+    const apiUrl = `https://api.langfllow.astra.datastax.com/lf/hjfjthfy094c622d-c27f-4177-a4fc-92c2c585b688/api/v1/run/2baa4466-2408-4abc-a2f7-b0e88a4a5201?stream=false`;
     console.log('Making request to:', apiUrl);
 
     const requestBody = {

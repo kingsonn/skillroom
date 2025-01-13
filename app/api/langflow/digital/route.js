@@ -107,3 +107,46 @@ console.log("this is sel, I AM WORKING", selectedSkill)
     );
   }
 }
+// import { NextResponse } from 'next/server';
+
+// export async function POST(request) {
+//   try {
+//     const body = await request.json();
+//     console.log('peeeeee1:', body);
+//     const { email, topic } = body;
+//     console.log('peeeeee2:', email, topic);
+//     const response = await fetch(`http://localhost:5000/generate-course`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//        email,topic
+//       })
+//     });
+
+//     const data = await response.json();
+//     console.log('peeeeee3:', data);
+//     let content;
+//     if (data) {
+//       content = data.content;
+//     } else {
+//       console.error('Unexpected response format:', data);
+//       return NextResponse.json(
+//         { error: 'Unexpected response format' },
+//         { status: 500 }
+//       );
+//     }
+                             
+//     return NextResponse.json({ structure: content });
+//   } catch (error) {
+//     console.error('Error in langflow API route:', error);
+//     return NextResponse.json(
+//       { 
+//         error: error.message || 'Failed to generate content',
+//         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }

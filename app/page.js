@@ -580,7 +580,7 @@ export default function Home() {
             {/* Skills Section */}
             <h2 className="text-2xl font-bold mb-4 flex items-center">
               <FaBolt className="mr-2 text-yellow-400" /> 
-              {isLoggedIn ? 'Top trending skills' : 'Available Skills'}
+              {isLoggedIn ? 'Top Agencies' : 'Trending Agencies'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trendingSkills.map((skill) => {
@@ -599,7 +599,7 @@ export default function Home() {
                     <div className="flex justify-between items-start">
                       <div>
                         <span className="text-2xl mb-2">{skill.icon}</span>
-                        <h3 className="text-lg font-semibold mt-2 dark:text-white">{skill.name}</h3>
+                        <h3 className="text-lg font-semibold mt-2 dark:text-white">{skill.name} Agency</h3>
                         <span className="text-green-500 dark:text-green-400 font-semibold">{skill.growth}</span>
                         {isStarted && (
                           <span className="text-xs text-purple-500 dark:text-purple-400 mt-1">In Progress</span>

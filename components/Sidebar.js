@@ -9,7 +9,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
 
   const navItems = [
     { path: '/', label: 'Home', icon: FiHome },
-    { path: '/learning', label: 'Learning', icon: FiBook },
+    { path: '/learning', label: 'Learning Hub', icon: FiBook },
+    { path: '/job-simulation', label: 'Missions', icon: FiLayout },
     { path: '/profile', label: 'Profile', icon: FiUser },
   ];
 
