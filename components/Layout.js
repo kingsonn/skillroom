@@ -133,7 +133,7 @@ export default function Layout({ children }) {
       localStorage.removeItem('userEmail'); 
       setUserEmail(null);
       localStorage.setItem('userReload', 'false');
-      router.push('/');
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }

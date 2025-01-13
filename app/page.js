@@ -336,7 +336,6 @@ export default function Home() {
     if (!customSkill.trim()) return;
 
     if (!isLoggedIn) {
-      setIsSignInModalOpen(true);
       return;
     }
  await handleStartQuest({ name: customSkill });
@@ -626,7 +625,6 @@ export default function Home() {
                     <button
                       onClick={() => {
                         if (!hasUserEmail) {
-                          setIsSignInModalOpen(true);
                           return;
                         }
                         isStarted ? router.push('/learning') : handleStartQuest(skill);
@@ -931,7 +929,6 @@ export default function Home() {
                       </div>
                       <p className="text-gray-500 dark:text-gray-400">Sign in to view your achievements</p>
                       <button
-                        onClick={() => setIsSignInModalOpen(true)}
                         className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200"
                       >
                         Sign In
